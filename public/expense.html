@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/expense.css">
+    <link rel="stylesheet" href="css/userHeader.css">
+</head>
+<body>
+    <div id="userHeaderContainer"></div>
+    
+
+
+        <div id="premiumNav" class="premium-nav">
+          
+
+<main class="page-content">
+    <h3 class="section-heading">Add Expense</h3>
+
+        <form id="expenseForm">
+            <label>Choose expense amount</label>
+            <input type="number" id="amount" required>
+
+            <label >Description</label>
+            <input type="text" id="description" required>
+
+        
+            <button type="submit">Add Expense</button>
+        </form>
+
+        <div id="loading" class="is-hidden">
+        <div class="spinner"></div>
+        <p>Categorizing expense with AI...</p>
+    </div>
+
+
+
+        <h1 class="section-heading">Expenses</h1>
+        <!--drop down page limit-->
+
+        <div class="top-controls">
+
+            <div class="page-limit">
+
+                <label for="rowsPerPage">Expenses per page:</label>
+
+                <select id="rowsPerPage">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+
+            </div>
+
+            
+
+        </div>
+
+
+    <table class="expense-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="expenseList"></tbody>
+    </table>
+
+    <div id="pagination"></div>
+
+</main>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="js/apiConfig.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/userHeader.js"></script>
+    
+    <script src="js/modules/domElements.js"></script>
+    <script src="js/modules/pagination.js"></script>
+    <script src="js/modules/premium.js"></script>
+    <script src="js/modules/expenses.js"></script>
+   
+    <script src="js/theme.js"></script>
+    <script src="js/expense.js"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Expense Reports</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/reports.css">
+    <link rel="stylesheet" href="css/userHeader.css">
+
+</head>
+
+<body>
+    <div id="userHeaderContainer"></div>
+
+
+
+    <div class="reports-container">
+
+        <div class="reports-header-row">
+
+            <h1>Expense Reports</h1>
+
+            <div class="export-actions">
+
+                <button id="exportPdfBtn" class="export-btn">Export PDF</button>
+
+                <button id="exportCsvBtn" class="export-btn">Export CSV</button>
+
+            </div>
+
+        </div>
+
+        <div class="tabs">
+
+            <button class="tab active" data-view="daily">Daily</button>
+
+            <button class="tab" data-view="weekly">Weekly</button>
+
+            <button class="tab" data-view="monthly">Monthly</button>
+
+            <button class="tab" data-view="yearly">Yearly</button>
+
+            <button class="tab" data-view="custom">Custom</button>
+
+        </div>
+
+        <div class="date-picker" id="periodNavControls">
+
+            <button id="prevBtn">◀</button>
+
+            <span></span>
+
+            <button id="nextBtn">▶</button>
+
+        </div>
+
+        <div class="top-controls" id="customRangeControls" class="is-hidden">
+
+            <div class="filter-group">
+                <label for="startDateInput">Start Date</label>
+                <input type="date" id="startDateInput">
+            </div>
+
+            <div class="filter-group">
+                <label for="endDateInput">End Date</label>
+                <input type="date" id="endDateInput">
+            </div>
+
+            <button id="applyFilterBtn">Apply</button>
+
+            <button id="resetFilterBtn">Reset</button>
+
+        </div>
+
+        <div class="summary is-hidden">
+
+            <div class="card">
+
+                <h3>Income</h3>
+
+                <h2 id="income">₹0</h2>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Expense</h3>
+
+                <h2 id="expense">₹0</h2>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Savings</h3>
+
+                <h2 id="saving">₹0</h2>
+
+            </div>
+
+        </div>
+
+        <div class="summary stats-compact">
+
+            <div class="card">
+
+                <h3>Total Spent</h3>
+
+                <h2 id="statTotalExpenses">₹0</h2>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Transactions</h3>
+
+                <h2 id="statTransactionCount">0</h2>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Average Expense</h3>
+
+                <h2 id="statAverageExpense">₹0</h2>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Highest Expense</h3>
+
+                <h2 id="statHighestExpense">₹0</h2>
+
+            </div>
+
+        </div>
+
+        <h1 class="section-heading">Analytics</h1>
+
+        <div class="category-section">
+
+            <div class="chart-card compact-chart">
+
+                <h3>Spending by Category</h3>
+
+                <div class="chart-canvas-wrapper">
+
+                    <canvas id="categoryBarChart"></canvas>
+
+                    <p class="chart-empty-message" id="categoryChartEmpty" class="chart-empty-message is-hidden">
+                        No expenses found.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="chart-card compact-chart">
+
+                <h3>Expense Trend</h3>
+
+                <div class="chart-canvas-wrapper">
+
+                    <canvas id="trendLineChart"></canvas>
+
+                    <p class="chart-empty-message" id="trendChartEmpty" class="chart-empty-message is-hidden">
+                        No expenses found.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <h1 class="section-heading">Transactions</h1>
+
+        <div class="table-card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Description</th>
+
+                        <th>Category</th>
+
+                        <th>Amount</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="reportBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- PDF LIBRARIES -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script src="js/apiConfig.js"></script>
+<script src="js/modules/auth.js"></script>
+<script src="js/modules/userHeader.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/reports.js"></script>
+
+</body>
+
+</html>

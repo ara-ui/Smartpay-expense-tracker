@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Leaderboard - Expense Tracker</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+    <link rel="stylesheet" href="css/userHeader.css">
+</head>
+<body>
+    <div id="userHeaderContainer"></div>
+
+    <main class="leaderboard-container">
+        <header class="leaderboard-hero">
+            <div class="leaderboard-hero-text">
+                <p class="leaderboard-eyebrow">SMART SAVINGS</p>
+                <h1>Savings Champions</h1>
+                <p class="leaderboard-subtitle">The leaderboard rewards the people who save the most within their spending limits.</p>
+            </div>
+        </header>
+
+        <section class="leaderboard-controls" aria-label="Leaderboard period">
+            <button type="button" class="period-button active" data-period="weekly">Weekly</button>
+            <button type="button" class="period-button" data-period="monthly">Monthly</button>
+        </section>
+
+        <section class="leaderboard-explainer">
+            <div>
+                <strong id="periodTitle">Weekly savings</strong>
+                <p>Champion is based on the highest amount saved: <b>budget limit − actual expenses</b>.</p>
+            </div>
+        </section>
+
+        <section id="championCard" class="champion-card" hidden></section>
+        <div id="leaderboardPodium" class="leaderboard-podium"></div>
+
+        <section class="leaderboard-table-card">
+            <div class="leaderboard-list-head">
+                <span>Rank</span>
+                <span>User</span>
+                <span>Saved</span>
+            </div>
+            <ul id="leaderboardList" class="leaderboard-list"></ul>
+        </section>
+
+        <p id="leaderboardMessage" class="leaderboard-message" role="status"></p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="js/apiConfig.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/userHeader.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/leaderboard.js"></script>
+</body>
+</html>

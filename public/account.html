@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Account - Expense Tracker</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/account.css">
+    <link rel="stylesheet" href="css/userHeader.css">
+
+</head>
+
+<body>
+
+    <div id="userHeaderContainer"></div>
+
+
+    <div class="account-container">
+
+        <h1 class="account-title">My Account</h1>
+
+        <!-- 1. PROFILE CARD -->
+        <section id="profileSection" class="acc-section">
+        </section>
+
+        <!-- 2. MEMBERSHIP CARD -->
+        <section id="membershipSection" class="acc-section">
+        </section>
+
+        <!-- 4. QUICK STATISTICS -->
+        <section id="statsSection" class="acc-section">
+        </section>
+
+        <!-- 6. SETTINGS SHORTCUTS -->
+        <section id="settingsShortcutsSection" class="acc-section">
+        </section>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="js/apiConfig.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/userHeader.js"></script>
+    <script src="js/modules/premium.js"></script>
+
+    <script src="js/theme.js"></script>
+    <script src="js/account.js"></script>
+
+</body>
+
+</html>

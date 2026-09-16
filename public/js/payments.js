@@ -1,0 +1,168 @@
+const demoBalance = document.getElementById("demoBalance");
+const demoPaymentId = document.getElementById("demoPaymentId");
+const receivePaymentId = document.getElementById("receivePaymentId");
+const copyPaymentId = document.getElementById("copyPaymentId");
+const copyReceiveId = document.getElementById("copyReceiveId");
+const sendMoneyButton = document.getElementById("sendMoneyButton");
+const receiveMoneyButton = document.getElementById("receiveMoneyButton");
+const refreshWallet = document.getElementById("refreshWallet");
+const walletMessage = document.getElementById("walletMessage");
+const demoTransferHistory = document.getElementById("demoTransferHistory");
+const demoTransferForm = document.getElementById("demoTransferForm");
+const demoRecipientPaymentId = document.getElementById("demoRecipientPaymentId");
+const demoTransferAmount = document.getElementById("demoTransferAmount");
+const demoTransferRemark = document.getElementById("demoTransferRemark");
+const demoTransferButton = document.getElementById("demoTransferButton");
+const demoTransferMessage = document.getElementById("demoTransferMessage");
+
+const formatMoney = (minor) => `₹${(Number(minor || 0) / 100).toFixed(2)}`;
+const formatDate = (value) => new Date(value).toLocaleString("en-IN", {
+    day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit"
+});
+const escapeHtml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+let currentPaymentId = "";
+let currentEmail = "";
+let walletData = null;
+let activityData = [];
+
+const openModal = (id) => { const el = document.getElementById(id); if (el) el.hidden = false; };
+const closeModal = (id) => { const el = document.getElementById(id); if (el) el.hidden = true; };
+
+document.querySelectorAll("[data-close]").forEach((button) => {
+    button.addEventListener("click", () => closeModal(button.dataset.close));
+});
+document.querySelectorAll(".wallet-modal").forEach((modal) => {
+    modal.addEventListener("click", (event) => { if (event.target === modal) modal.hidden = true; });
+});
+
+const copyText = async (value, button) => {
+    if (!value) return;
+    try {
+        await navigator.clipboard.writeText(value);
+        const oldText = button.textContent;
+        button.textContent = "Copied";
+        setTimeout(() => { button.textContent = oldText; }, 1200);
+    } catch { walletMessage.textContent = "Could not copy the Payment ID. Please copy it manually."; }
+};
+
+const showDetail = (transfer) => {
+    const senderEmail = String(transfer.senderId?.email || "").toLowerCase();
+    const isSent = senderEmail === currentEmail;
+    const other = isSent ? transfer.receiverId : transfer.senderId;
+    document.getElementById("detailEyebrow").textContent = isSent ? "SENT PAYMENT" : "MONEY RECEIVED";
+    document.getElementById("detailTitle").textContent = isSent ? "Payment Details" : "Receipt Details";
+    document.getElementById("detailAmount").textContent = `${isSent ? "−" : "+"}${formatMoney(transfer.amountMinor)}`;
+    document.getElementById("detailOther").textContent = `${isSent ? "Paid to " : "Received from "}${other?.name || "SmartPay user"}`;
+    document.getElementById("detailOtherPaymentId").textContent = other?.paymentId || "—";
+    document.getElementById("detailRemark").textContent = transfer.remark || "—";
+    document.getElementById("detailDate").textContent = formatDate(transfer.createdAt);
+    document.getElementById("detailTransferId").textContent = transfer.transferId || "—";
+    document.getElementById("detailStatus").textContent = transfer.status || "Successful";
+    openModal("paymentDetailModal");
+};
+
+const renderHistory = (transfers) => {
+    activityData = Array.isArray(transfers) ? transfers : [];
+    if (!activityData.length) {
+        demoTransferHistory.innerHTML = '<div class="payment-empty">No wallet activity yet.</div>';
+        return;
+    }
+    demoTransferHistory.innerHTML = activityData.map((transfer, index) => {
+        const senderEmail = String(transfer.senderId?.email || "").toLowerCase();
+        const isSent = senderEmail === currentEmail;
+        const other = isSent ? transfer.receiverId : transfer.senderId;
+        const name = other?.name || "SmartPay user";
+        const id = other?.paymentId || "";
+        return `<button type="button" class="payment-row payment-row-button" data-activity-index="${index}">
+            <span><strong class="payment-amount">${isSent ? "−" : "+"}${formatMoney(transfer.amountMinor)}</strong>
+            <small class="payment-label">${escapeHtml(isSent ? `Paid to ${name}` : `Received from ${name}`)}</small>
+            ${id ? `<small class="payment-label">${escapeHtml(id)}</small>` : ""}</span>
+            <span class="payment-row-right"><small class="payment-type">${isSent ? "SENT" : "RECEIVED"}</small><span class="payment-time">${formatDate(transfer.createdAt)}</span></span>
+        </button>`;
+    }).join("");
+    demoTransferHistory.querySelectorAll("[data-activity-index]").forEach((row) => {
+        row.addEventListener("click", () => showDetail(activityData[Number(row.dataset.activityIndex)]));
+    });
+};
+
+const loadWalletOnly = async () => {
+    try {
+        const response = await api.get("/payments/demo/wallet", { timeout: 8000 });
+        const wallet = response.data.wallet;
+        walletData = wallet;
+        currentPaymentId = wallet.paymentId || "";
+        currentEmail = String(wallet.email || "").toLowerCase();
+        demoBalance.textContent = formatMoney(wallet.balanceMinor);
+        demoPaymentId.textContent = wallet.paymentId || "Unavailable";
+        receivePaymentId.textContent = wallet.paymentId || "Unavailable";
+        return wallet;
+    } catch (err) {
+        if (err.response?.status === 403) { window.location.replace("premium-required.html?return=payments.html"); return null; }
+        demoBalance.textContent = "—";
+        demoPaymentId.textContent = "Unavailable";
+        receivePaymentId.textContent = "Unavailable";
+        walletMessage.textContent = err.code === "ECONNABORTED" ? "Wallet is taking too long to respond. Please refresh." : (err.response?.data?.message || "Unable to load SmartPay Wallet.");
+        return null;
+    }
+};
+
+const loadActivity = async () => {
+    try {
+        const response = await api.get("/payments/demo/history?limit=10", { timeout: 8000 });
+        renderHistory(response.data.transfers || []);
+    } catch (err) {
+        demoTransferHistory.innerHTML = '<div class="payment-empty">Wallet activity could not be loaded. Your balance is still available above.</div>';
+    }
+};
+
+const loadWallet = async () => {
+    walletMessage.textContent = "";
+    demoTransferHistory.innerHTML = '<div class="payment-empty">Loading wallet activity...</div>';
+    await Promise.allSettled([loadWalletOnly(), loadActivity()]);
+};
+
+sendMoneyButton.addEventListener("click", () => {
+    demoTransferMessage.textContent = "";
+    demoTransferForm.reset();
+    openModal("sendModal");
+    demoRecipientPaymentId.focus();
+});
+receiveMoneyButton.addEventListener("click", () => {
+    receivePaymentId.textContent = currentPaymentId || "Loading...";
+    openModal("receiveModal");
+});
+copyPaymentId.addEventListener("click", () => copyText(currentPaymentId, copyPaymentId));
+copyReceiveId.addEventListener("click", () => copyText(currentPaymentId, copyReceiveId));
+refreshWallet.addEventListener("click", loadWallet);
+
+demoTransferForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    demoTransferMessage.textContent = "";
+    const recipientPaymentId = demoRecipientPaymentId.value.trim().toLowerCase();
+    const amount = Number(demoTransferAmount.value);
+    const remark = demoTransferRemark.value.trim() || "SmartPay transfer";
+    if (!recipientPaymentId) return void (demoTransferMessage.textContent = "Enter the recipient's SmartPay Payment ID.");
+    if (!Number.isFinite(amount) || amount <= 0) return void (demoTransferMessage.textContent = "Enter a valid amount.");
+    if (recipientPaymentId === currentPaymentId) return void (demoTransferMessage.textContent = "You cannot send money to your own Payment ID.");
+    demoTransferButton.disabled = true; demoTransferButton.textContent = "Processing...";
+    try {
+        const response = await api.post("/payments/demo/transfer", { recipientPaymentId, amount, remark }, { headers: { "Idempotency-Key": crypto.randomUUID() }, timeout: 12000 });
+        const transfer = response.data.transfer;
+        if (response.data.transfer?.senderBalanceAfterMinor != null) {
+            demoBalance.textContent = formatMoney(response.data.transfer.senderBalanceAfterMinor);
+        }
+        demoTransferMessage.textContent = `✓ ${response.data.message}`;
+        closeModal("sendModal");
+        await Promise.allSettled([loadWalletOnly(), loadActivity()]);
+        if (transfer) setTimeout(() => showDetail(transfer), 150);
+    } catch (err) {
+        demoTransferMessage.textContent = err.code === "ECONNABORTED" ? "Payment is taking too long. Check your activity before trying again." : (err.response?.data?.message || "Payment could not be completed.");
+    } finally { demoTransferButton.disabled = false; demoTransferButton.textContent = "Continue"; }
+});
+
+requireAuth();
+if (!isPremium()) window.location.replace("premium-required.html?return=payments.html");
+else loadWallet();

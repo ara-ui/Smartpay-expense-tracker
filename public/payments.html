@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPay Wallet | Expense Tracker</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/userHeader.css">
+    <link rel="stylesheet" href="css/payments.css">
+</head>
+<body>
+    <div id="userHeaderContainer"></div>
+
+    <main class="payments-page">
+        <header class="payments-header">
+            <div>
+                <p class="payments-eyebrow">SMARTPAY</p>
+                <h1>My Wallet</h1>
+                <p>Send and receive money inside your SmartPay demo account.</p>
+            </div>
+            
+        </header>
+
+        <section class="wallet-card" aria-labelledby="walletTitle">
+            <div class="wallet-topline">
+                <div>
+                    <p class="wallet-label">SmartPay Wallet</p>
+                    <h2 id="walletTitle">Available Balance</h2>
+                    <strong id="demoBalance" class="wallet-balance">Loading...</strong>
+                </div>
+                <span class="wallet-status">DEMO ACCOUNT</span>
+            </div>
+
+            <div class="wallet-id-row">
+                <div>
+                    <span class="wallet-id-label">My Payment ID</span>
+                    <strong id="demoPaymentId">Loading...</strong>
+                </div>
+                <button id="copyPaymentId" class="copy-button" type="button">Copy</button>
+            </div>
+
+            <div class="wallet-actions">
+                <button id="sendMoneyButton" class="wallet-action primary" type="button">Send Money</button>
+                <button id="receiveMoneyButton" class="wallet-action" type="button">Receive Money</button>
+            </div>
+
+            <p class="wallet-note">Your Payment ID is generated automatically. This is an internal SmartPay demo account; no real money is transferred.</p>
+            <p id="walletMessage" class="payment-message" role="alert"></p>
+        </section>
+
+        <section class="spending-guard" aria-labelledby="spendingGuardTitle">
+            <div>
+                <p class="wallet-label">SPENDING GUARD</p>
+                <h2 id="spendingGuardTitle">Your budget stays separate from your wallet</h2>
+                <p>SmartPay checks your configured spending limits before an outgoing demo payment is completed.</p>
+            </div>
+            <a href="budget.html" class="guard-link">View Budget</a>
+        </section>
+
+        <section class="recent-section" aria-labelledby="recentTitle">
+            <div class="recent-heading">
+                <h2 id="recentTitle">Recent Wallet Activity</h2>
+                <button id="refreshWallet" class="secondary-button" type="button">Refresh</button>
+            </div>
+            <div id="demoTransferHistory" class="payment-list" aria-live="polite"><div class="payment-empty">Loading wallet activity...</div></div>
+        </section>
+    </main>
+
+    <div id="sendModal" class="wallet-modal" hidden>
+        <div class="wallet-modal-card">
+            <button class="modal-close" data-close="sendModal" type="button" aria-label="Close">×</button>
+            <p class="wallet-label">SMARTPAY</p>
+            <h2>Send Money</h2>
+            <p class="modal-subtitle">Send virtual money to another SmartPay account.</p>
+
+            <form id="demoTransferForm" novalidate>
+                <label for="demoRecipientPaymentId">Recipient Payment ID</label>
+                <input id="demoRecipientPaymentId" type="text" autocomplete="off" placeholder="rahul@smartpay" required>
+                <small class="field-hint">Ask the recipient to open <strong>Receive Money</strong> and share their Payment ID.</small>
+
+                <label for="demoTransferAmount">Amount</label>
+                <div class="amount-input-wrap">
+                    <span>₹</span>
+                    <input id="demoTransferAmount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="0.00" required>
+                </div>
+
+                <label for="demoTransferRemark">Remark</label>
+                <input id="demoTransferRemark" type="text" maxlength="200" placeholder="e.g. Dinner">
+
+                <p id="demoTransferMessage" class="payment-message" role="alert"></p>
+                <button id="demoTransferButton" class="pay-button" type="submit">Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="receiveModal" class="wallet-modal" hidden>
+        <div class="wallet-modal-card receive-card">
+            <button class="modal-close" data-close="receiveModal" type="button" aria-label="Close">×</button>
+            <p class="wallet-label">RECEIVE MONEY</p>
+            <h2>Share your Payment ID</h2>
+            <p class="modal-subtitle">Another SmartPay user can send money to this ID.</p>
+
+            <div class="receive-id-box">
+                <span>Your Payment ID</span>
+                <strong id="receivePaymentId">Loading...</strong>
+            </div>
+
+            <button id="copyReceiveId" class="pay-button" type="button">Copy Payment ID</button>
+            <p class="wallet-note">Incoming payments are added to your virtual wallet automatically.</p>
+        </div>
+    </div>
+
+    <div id="paymentDetailModal" class="wallet-modal" hidden>
+        <div class="wallet-modal-card receive-card">
+            <button class="modal-close" data-close="paymentDetailModal" type="button" aria-label="Close">×</button>
+            <p class="wallet-label" id="detailEyebrow">SMARTPAY</p>
+            <h2 id="detailTitle">Payment Details</h2>
+            <div class="receive-id-box">
+                <span>Amount</span>
+                <strong id="detailAmount">₹0.00</strong>
+            </div>
+            <div class="payment-detail-grid">
+                <div><span>To / From</span><strong id="detailOther">—</strong></div>
+                <div><span>Payment ID</span><strong id="detailOtherPaymentId">—</strong></div>
+                <div><span>Remark</span><strong id="detailRemark">—</strong></div>
+                <div><span>Date</span><strong id="detailDate">—</strong></div>
+                <div><span>Transaction ID</span><strong id="detailTransferId">—</strong></div>
+                <div><span>Status</span><strong id="detailStatus">Successful</strong></div>
+            </div>
+            <p class="wallet-note">SmartPay Demo payment — no real money is transferred.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/apiConfig.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/modules/userHeader.js"></script>
+    <script src="js/payments.js"></script>
+</body>
+</html>

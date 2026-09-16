@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Status | Expense Tracker</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/payment-status.css">
+</head>
+<body>
+    <main class="payment-card" aria-live="polite">
+        <div id="paymentStatusIcon">…</div>
+        <h1 id="paymentStatusTitle">Verifying your payment…</h1>
+        <p id="paymentStatusMessage">Please wait.</p>
+        <div class="actions">
+            <button id="paymentRetryButton" hidden>Check Again</button>
+            <button id="paymentDashboardButton">Back to Dashboard</button>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="js/apiConfig.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/payment-status.js"></script>
+</body>
+</html>

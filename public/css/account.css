@@ -1,0 +1,491 @@
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ---------------- PAGE LAYOUT ---------------- */
+
+.account-container {
+    width: var(--content-width);
+    max-width: var(--content-max-width);
+    margin: auto;
+    padding: 40px 0 60px;
+}
+
+.account-title {
+    margin-bottom: 30px;
+    color: var(--heading);
+    font-size: 32px;
+}
+
+.acc-section {
+    margin-bottom: 35px;
+}
+
+/* ---------------- REUSABLE CARD ---------------- */
+
+.acc-card {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+}
+
+.acc-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 18px;
+}
+
+.acc-card-subtext {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.acc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* ---------------- BADGES ---------------- */
+
+.acc-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.acc-badge-premium {
+    background: #fff3cd;
+    color: #c28a00;
+}
+
+.acc-badge-free {
+    background: var(--secondary);
+    color: var(--muted);
+}
+
+.acc-badge-status {
+    background: #e7f8ee;
+    color: #1e8449;
+}
+
+/* ---------------- BUTTONS ---------------- */
+
+.acc-btn {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    background: var(--primary);
+    color: #ffffff;
+    transition:
+        background .2s ease,
+        transform .1s ease,
+        box-shadow .2s ease,
+        opacity .2s ease;
+}
+
+.acc-btn:hover {
+    opacity: .9;
+}
+
+.acc-btn-secondary {
+    background: var(--secondary);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.acc-btn-secondary:hover {
+    background: var(--hover);
+}
+
+/* ---------------- SAVING BUTTON STATE ---------------- */
+
+.acc-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: scale(0.98);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------------- PLACEHOLDER VALUES ---------------- */
+
+.acc-placeholder {
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* ---------------- PROFILE CARD ---------------- */
+
+.acc-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.acc-profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.acc-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.acc-profile-info h2 {
+    font-size: 22px;
+    color: var(--heading);
+    margin-bottom: 4px;
+}
+
+.acc-profile-info p {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.acc-profile-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 8px;
+}
+
+/* ---------------- MEMBERSHIP CARD ---------------- */
+
+.acc-membership-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.acc-detail-label {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 6px;
+}
+
+.acc-detail-value {
+    color: var(--heading);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ---------------- STAT CARD ---------------- */
+
+.acc-stat-card {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 22px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+    text-align: center;
+}
+
+.acc-stat-card h3 {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 10px;
+}
+
+.acc-stat-card .acc-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--heading);
+}
+
+/* ---------------- SETTINGS SHORTCUT CARD ---------------- */
+
+.acc-shortcut-card {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.acc-shortcut-card:hover {
+    background: var(--hover);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .12);
+    transform: translateY(-2px);
+}
+
+.acc-shortcut-icon {
+    font-size: 22px;
+}
+
+.acc-shortcut-label {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+}
+
+/* ---------------- CHANGE PASSWORD MODAL ---------------- */
+
+.password-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 9999;
+}
+
+.password-modal {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+}
+
+.password-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.password-modal-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 6px;
+}
+
+.password-modal-subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 22px;
+}
+
+.password-label {
+    display: block;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 7px;
+    margin-top: 15px;
+}
+
+.password-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border .2s, box-shadow .2s;
+}
+
+.password-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, .1);
+}
+
+.password-strength {
+    margin: 10px 0 16px;
+}
+
+.password-strength-text {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.password-strength-track {
+    width: 100%;
+    height: 6px;
+    background: var(--secondary);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.password-strength-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--primary);
+    border-radius: 10px;
+    transition: width .25s ease;
+}
+
+.password-error {
+    color: #dc3545;
+    font-size: 13px;
+    margin: 10px 0;
+}
+
+.password-success-message {
+    background: #ecfdf5;
+    color: #166534;
+    border-left: 4px solid #22c55e;
+    padding: 12px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.password-action-btn {
+    width: 100%;
+    margin-top: 18px;
+}
+
+.password-action-btn:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+    transform: scale(.98);
+}
+
+.password-resend-btn {
+    display: block;
+    margin: 16px auto 0;
+    border: none;
+    background: transparent;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.password-resend-btn:hover {
+    text-decoration: underline;
+}
+
+.password-otp-input {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 8px;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 900px) {
+
+    .acc-profile-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .acc-profile-meta {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .account-container {
+        width: 94%;
+        padding: 25px 0 40px;
+    }
+
+    .account-title {
+        font-size: 26px;
+    }
+
+    .acc-card {
+        padding: 18px;
+    }
+
+    .password-modal {
+        padding: 24px 20px;
+    }
+}
+
+/* ---------------- THEME MODAL SPACING ---------------- */
+
+#themeModal .password-modal {
+    padding: 32px;
+}
+
+#themeModal .password-modal-title {
+    margin-bottom: 14px;
+}
+
+#themeModal .password-modal-subtitle {
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+#themeModal .theme-options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 26px;
+}
+
+#themeModal .theme-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+#themeModal .theme-option input {
+    margin: 0;
+}
+
+#themeModal .password-action-btn {
+    margin-top: 4px;
+}
+
+/* ---------------- ACCOUNT UTILITIES ---------------- */
+.is-hidden {
+    display: none !important;
+}
+
+.acc-membership-upgrade-text {
+    margin-bottom: 16px;
+}
+
+.acc-button-spaced {
+    margin-top: 18px;
+}

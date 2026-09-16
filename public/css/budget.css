@@ -1,0 +1,505 @@
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.budget-page {
+    width: var(--content-width);
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 40px 0 70px;
+}
+
+.budget-page-header {
+    margin-bottom: 30px;
+}
+
+.budget-eyebrow {
+    margin: 0 0 6px;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.budget-page-header h1 {
+    margin: 0 0 8px;
+    color: var(--heading);
+    font-size: 34px;
+}
+
+.budget-intro,
+.section-heading-row p,
+.budget-card-heading p,
+.budget-note p {
+    color: var(--muted);
+}
+
+.budget-intro {
+    margin: 0;
+    font-size: 15px;
+}
+
+.budget-section {
+    margin-top: 32px;
+}
+
+.budget-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .07);
+}
+
+.budget-overview-card {
+    padding: 26px;
+}
+
+.budget-card-heading,
+.section-heading-row,
+.form-actions,
+.budget-progress-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.budget-card-heading h2,
+.section-heading-row h2 {
+    margin: 0 0 5px;
+    color: var(--heading);
+    font-size: 21px;
+}
+
+.budget-card-heading p,
+.section-heading-row p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.budget-badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--secondary);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.budget-badge.good {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.budget-badge.warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.budget-badge.exceeded {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.budget-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 28px 0 22px;
+}
+
+.budget-overview-stat {
+    padding: 18px;
+    background: var(--secondary);
+    border-radius: 12px;
+}
+
+.budget-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.budget-overview-stat strong {
+    color: var(--heading);
+    font-size: 23px;
+}
+
+.budget-progress {
+    height: 12px;
+    overflow: hidden;
+    background: var(--secondary);
+    border-radius: 999px;
+}
+
+.budget-progress-bar {
+    width: 0;
+    height: 100%;
+    background: var(--primary);
+    border-radius: inherit;
+    transition: width .25s ease;
+}
+
+.budget-progress-bar.warning {
+    background: #d97706;
+}
+
+.budget-progress-bar.exceeded {
+    background: #dc2626;
+}
+
+.budget-progress-meta {
+    margin-top: 9px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.budget-form {
+    margin-top: 16px;
+    padding: 22px;
+}
+
+.limit-grid,
+.category-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.limit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.limit-field input,
+.limit-field select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 9px;
+    background: var(--input-bg);
+    color: var(--text);
+    font: inherit;
+    outline: none;
+}
+
+.limit-field input:focus,
+.limit-field select:focus {
+    border-color: var(--primary);
+}
+
+.limit-field small {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.form-actions {
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+    border: 1px solid transparent;
+    border-radius: 9px;
+    padding: 11px 17px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: #fff;
+}
+
+.secondary-btn {
+    background: var(--secondary);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.danger-btn {
+    background: transparent;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.form-message {
+    min-height: 18px;
+    margin: 12px 0 0;
+    font-size: 13px;
+}
+
+.form-message.success {
+    color: #15803d;
+}
+
+.form-message.error {
+    color: #b91c1c;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 16px;
+}
+
+.status-card {
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .06);
+}
+
+.status-card h3 {
+    margin: 0 0 14px;
+    color: var(--heading);
+    font-size: 16px;
+}
+
+.status-values {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.status-values strong {
+    color: var(--heading);
+    font-size: 18px;
+}
+
+.status-values span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.status-bar {
+    height: 8px;
+    overflow: hidden;
+    background: var(--secondary);
+    border-radius: 999px;
+}
+
+.status-bar-fill {
+    width: 0;
+    height: 100%;
+    background: var(--primary);
+    border-radius: inherit;
+}
+
+.status-bar-fill.warning {
+    background: #d97706;
+}
+
+.status-bar-fill.exceeded {
+    background: #dc2626;
+}
+
+.category-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.category-row {
+    display: grid;
+    grid-template-columns: 1.4fr .9fr .9fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.category-name {
+    color: var(--heading);
+    font-weight: 700;
+}
+
+.category-period {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.category-limit,
+.category-spent {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.budget-note {
+    margin-top: 30px;
+    padding: 18px 20px;
+    border-left: 4px solid var(--primary);
+    background: var(--secondary);
+    border-radius: 8px;
+}
+
+.budget-note strong {
+    color: var(--heading);
+}
+
+.budget-note p {
+    margin: 7px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.empty-state {
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+}
+
+@media (max-width: 800px) {
+    .budget-page {
+        width: 94%;
+    }
+
+    .budget-overview-grid,
+    .limit-grid,
+    .category-form-grid,
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .category-row .danger-btn {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 520px) {
+    .budget-page {
+        padding-top: 28px;
+    }
+
+    .budget-overview-card,
+    .budget-form {
+        padding: 18px;
+    }
+
+    .budget-card-heading,
+    .section-heading-row,
+    .budget-progress-meta {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .category-row {
+        grid-template-columns: 1fr;
+    }
+
+    .category-row .danger-btn {
+        grid-column: auto;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+}
+
+
+.edit-limits-btn {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.edit-limits-btn:hover {
+    background: #1d4ed8;
+}
+
+.edit-limits-btn.editing {
+    background: #e5e7eb;
+    color: #111827;
+    border-color: #d1d5db;
+}
+
+.limit-field input:disabled {
+    background: #e5e7eb;
+    color: #374151;
+    cursor: not-allowed;
+}
+
+.budget-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.budget-modal[hidden] {
+    display: none;
+}
+
+.budget-modal-card {
+    position: relative;
+    width: min(430px, 100%);
+    padding: 28px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.budget-modal-card h2 {
+    margin: 0 0 8px;
+}
+
+.budget-modal-card > p {
+    margin: 0 0 22px;
+}
+
+.budget-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    border: 0;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.budget-forgot-link {
+    display: inline-block;
+    margin-top: 16px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.budget-forgot-link:hover {
+    text-decoration: underline;
+}

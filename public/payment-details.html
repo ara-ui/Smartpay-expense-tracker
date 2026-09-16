@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details | Expense Tracker</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/userHeader.css">
+    <link rel="stylesheet" href="css/payment-details.css">
+</head>
+<body>
+    <div id="userHeaderContainer"></div>
+    <main class="details-page">
+        <a href="payment-history.html" class="back-link">← Back to History</a>
+        <section id="paymentDetails" class="details-card" aria-live="polite">
+            <p>Loading payment details...</p>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="js/apiConfig.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/userHeader.js"></script>
+    <script src="js/payment-details.js"></script>
+</body>
+</html>

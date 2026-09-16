@@ -1,0 +1,146 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.premium-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 20px;
+}
+
+.premium-card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--card);
+    padding: 42px 45px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border);
+}
+
+.premium-icon {
+    font-size: 42px;
+    margin-bottom: 15px;
+}
+
+.premium-card h1 {
+    font-size: 28px;
+    color: var(--heading);
+    margin-bottom: 10px;
+}
+
+.premium-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 14px;
+}
+
+.premium-description {
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 15px;
+    margin-bottom: 28px;
+}
+
+.premium-benefits {
+    text-align: left;
+    background: var(--hover);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 25px;
+    margin-bottom: 28px;
+}
+
+.premium-benefits h3 {
+    font-size: 16px;
+    color: var(--heading);
+    margin-bottom: 14px;
+}
+
+.premium-benefits ul {
+    list-style: none;
+}
+
+.premium-benefits li {
+    color: var(--text);
+    font-size: 15px;
+    padding: 7px 0;
+}
+
+.premium-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.upgrade-btn,
+.dashboard-btn {
+    width: 100%;
+    padding: 13px 20px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.upgrade-btn {
+    border: none;
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.upgrade-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.dashboard-btn {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+}
+
+.dashboard-btn:hover {
+    background: var(--hover);
+}
+
+@media (max-width: 600px) {
+
+    .premium-page {
+        padding: 20px 15px;
+    }
+
+    .premium-card {
+        padding: 32px 22px;
+    }
+
+    .premium-card h1 {
+        font-size: 24px;
+    }
+
+    .premium-title {
+        font-size: 17px;
+    }
+
+    .premium-description {
+        font-size: 14px;
+    }
+
+    .premium-benefits {
+        padding: 18px 20px;
+    }
+}
