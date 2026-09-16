@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const { CATEGORIES } = require("../utils/categories");
 const {
     getBudgetStatus,
+    getDailyInsights,
     getOrCreateBudgetRule
 } = require("../services/budgetService");
 const BudgetAuditLog = require("../model/BudgetAuditLog");
@@ -241,6 +242,19 @@ exports.getBudgetStatus = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Unable to load budget status"
+        });
+    }
+};
+
+exports.getInsights = async (req, res) => {
+    try {
+        const { insights } = await getDailyInsights(req.user._id);
+        res.status(200).json({ success: true, insights });
+    } catch (err) {
+        console.error("Get daily insights failed:", err);
+        res.status(500).json({
+            success: false,
+            message: "Unable to load daily insights"
         });
     }
 };

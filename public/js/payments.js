@@ -166,3 +166,14 @@ demoTransferForm.addEventListener("submit", async (event) => {
 requireAuth();
 if (!isPremium()) window.location.replace("premium-required.html?return=payments.html");
 else loadWallet();
+
+// Chrome/Firefox can restore this page from the back/forward cache when the
+// user navigates away and then back (browser Back/Forward, not an in-page
+// link). A bfcache restore does NOT re-run DOMContentLoaded, so without this
+// the page stays frozen on whatever it showed at the moment of navigating
+// away - including "Loading..." if the wallet hadn't finished fetching yet.
+// event.persisted is true only for a bfcache restore, so this never causes
+// a duplicate load on a normal first visit.
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) loadWallet();
+});

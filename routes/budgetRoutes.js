@@ -11,7 +11,8 @@ const {
     updateBudgetRules,
     upsertCategoryLimit,
     deleteCategoryLimit,
-    getBudgetStatus
+    getBudgetStatus,
+    getInsights
 } = require("../controller/budgetController");
 
 router.post("/verify-password", authenticate, requirePremium, authLimiter, verifyBudgetPassword);
@@ -23,5 +24,6 @@ router.post("/rules/category", authenticate, requirePremium, budgetReauth, upser
 router.delete("/rules/category/:category", authenticate, requirePremium, budgetReauth, deleteCategoryLimit);
 
 router.get("/status", authenticate, requirePremium, getBudgetStatus);
+router.get("/insights", authenticate, requirePremium, getInsights);
 
 module.exports = router;

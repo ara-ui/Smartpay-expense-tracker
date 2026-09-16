@@ -362,3 +362,40 @@ h1 {
 }
 
 .is-hidden { display: none !important; }
+
+/* Daily Insight widget */
+.insight-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 0 0 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+}
+.insight-eyebrow {
+    margin: 0 0 10px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    color: var(--primary);
+}
+.insight-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.insight-item {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(127,127,127,.06);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+.insight-item.insight-positive { border-left: 3px solid #16a34a; }
+.insight-item.insight-warning { border-left: 3px solid #d97706; }
+.insight-item.insight-neutral { border-left: 3px solid var(--primary); }

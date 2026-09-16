@@ -361,6 +361,104 @@ async function getBudgetStatus(userId, date = new Date()) {
     return { budgetRules, usage: result };
 }
 
+const formatRupees = (paise) =>
+    (Number(paise || 0) / 100).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+
+async function categoryTotalsForWeek(userId, start, end) {
+    const rows = await Expense.aggregate([
+        { $match: { userId, createdAt: { $gte: start, $lt: end } } },
+        { $group: { _id: "$category", totalPaise: { $sum: { $round: [{ $multiply: ["$amount", 100] }, 0] } } } }
+    ]);
+    const byCategory = new Map(rows.map((row) => [row._id, Number(row.totalPaise || 0)]));
+    const total = rows.reduce((sum, row) => sum + Number(row.totalPaise || 0), 0);
+    return { total, byCategory };
+}
+
+// Builds a small set of plain-language "Daily Insight" messages from real
+// expense/budget data only. Nothing here is invented: every number traces
+// back to an aggregation over the user's own Expense/BudgetRule documents.
+async function getDailyInsights(userId, date = new Date()) {
+    const budgetRules = await getOrCreateBudgetRule(userId, null);
+    const thisWeek = getPeriodBounds("weekly", date);
+    const lastWeek = getPeriodBounds("weekly", new Date(thisWeek.start.getTime() - 1));
+
+    const [thisWeekData, lastWeekData] = await Promise.all([
+        categoryTotalsForWeek(userId, thisWeek.start, thisWeek.end),
+        categoryTotalsForWeek(userId, lastWeek.start, lastWeek.end)
+    ]);
+
+    const weeklyLimitPaise = budgetRules?.weeklyLimitPaise ?? null;
+    const insights = [];
+
+    if (weeklyLimitPaise) {
+        if (thisWeekData.total <= weeklyLimitPaise) {
+            insights.push({
+                type: "BUDGET_STATUS",
+                tone: "positive",
+                message: `You're within your weekly budget, with ₹${formatRupees(weeklyLimitPaise - thisWeekData.total)} left to spend.`
+            });
+        } else {
+            insights.push({
+                type: "BUDGET_STATUS",
+                tone: "warning",
+                message: `You're ₹${formatRupees(thisWeekData.total - weeklyLimitPaise)} over your weekly budget this week.`
+            });
+        }
+
+        if (lastWeekData.total > 0) {
+            const savingsThisWeek = weeklyLimitPaise - thisWeekData.total;
+            const savingsLastWeek = weeklyLimitPaise - lastWeekData.total;
+            const diff = savingsThisWeek - savingsLastWeek;
+
+            if (savingsThisWeek > 0 && diff > 0) {
+                insights.push({
+                    type: "SAVINGS_TREND",
+                    tone: "positive",
+                    message: `You saved ₹${formatRupees(savingsThisWeek)} this week, ₹${formatRupees(diff)} more than last week.`
+                });
+            } else if (diff < 0) {
+                insights.push({
+                    type: "SAVINGS_TREND",
+                    tone: "neutral",
+                    message: `You spent ₹${formatRupees(Math.abs(diff))} more than last week. A small tweak now can get you back on track.`
+                });
+            }
+        }
+    }
+
+    let biggestCategory = null;
+    let biggestDelta = 0;
+    const allCategories = new Set([...thisWeekData.byCategory.keys(), ...lastWeekData.byCategory.keys()]);
+    for (const category of allCategories) {
+        const current = thisWeekData.byCategory.get(category) || 0;
+        const previous = lastWeekData.byCategory.get(category) || 0;
+        const delta = current - previous;
+        if (previous > 0 && Math.abs(delta) > Math.abs(biggestDelta)) {
+            biggestDelta = delta;
+            biggestCategory = { category, current, previous };
+        }
+    }
+    if (biggestCategory && biggestDelta !== 0) {
+        const pct = Math.round((Math.abs(biggestDelta) / biggestCategory.previous) * 100);
+        const direction = biggestDelta < 0 ? "decreased" : "increased";
+        insights.push({
+            type: "CATEGORY_TREND",
+            tone: direction === "decreased" ? "positive" : "neutral",
+            message: `Your ${biggestCategory.category} spending ${direction} by ${pct}% this week.`
+        });
+    }
+
+    if (!insights.length) {
+        insights.push({
+            type: "ONBOARDING",
+            tone: "neutral",
+            message: "Add a few expenses and set a weekly budget to start seeing personalized insights here."
+        });
+    }
+
+    return { insights: insights.slice(0, 3) };
+}
+
 module.exports = {
     BudgetExceededError,
     amountToPaise,
@@ -368,6 +466,7 @@ module.exports = {
     checkExpenseBudget,
     reverseExpenseBudget,
     getBudgetStatus,
+    getDailyInsights,
     getOrCreateBudgetRule,
     getPeriodInfo,
     getPeriodBounds
