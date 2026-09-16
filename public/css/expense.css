@@ -1,11 +1,7 @@
-
-
-
 body {
     background: var(--bg);
     color: var(--text);
 }
-
 
 .premium-section {
     width: 100%;
@@ -14,79 +10,67 @@ body {
 }
 
 #premiumMessage {
-    font-size: 38px;
-    color: #1f2937;
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--heading);
     margin-bottom: 25px;
 }
 
-
- 
-
-
 .top-controls {
     width: 100%;
-    
     margin: 20px auto;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     gap: 20px;
 }
-
 
 .page-content {
     width: var(--content-width);
     max-width: var(--content-max-width);
     margin: 0 auto;
-    padding: 40px 0 60px;
+    padding: 32px 0 60px;
 }
+
 .page-limit {
-    background: var(--card);
+    background: var(--surface);
     color: var(--text);
-
-    padding: 15px 20px;
-    border-radius: 12px;
-
+    padding: 13px 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 12px;
-
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
 }
 
 .page-limit label {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary);
 }
 
 .page-limit select {
     padding: 8px 12px;
-
     background: var(--input-bg);
     color: var(--text);
-
     border: 1px solid var(--input-border);
-    border-radius: 8px;
-
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
 }
+.page-limit select:focus { border-color: var(--primary); box-shadow: var(--focus-ring); outline: none; }
 
-
+/* ---- Add Expense form ---- */
 #expenseForm {
     width: 100%;
-    margin: 0 0 30px;
-
-    background: var(--card);
+    margin: 0 0 26px;
+    background: var(--surface);
     color: var(--text);
-
-    padding: 20px;
-    border-radius: 12px;
-
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
-
+    padding: 20px 22px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     gap: 15px;
@@ -94,120 +78,99 @@ body {
 }
 
 #expenseForm label {
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--text-secondary);
 }
 #expenseForm input {
-    padding: 10px;
-
+    padding: 10px 12px;
     background: var(--input-bg);
     color: var(--text);
-
     border: 1px solid var(--input-border);
-    border-radius: 8px;
-
+    border-radius: var(--radius-sm);
     outline: none;
-    font-size: 15px;
+    font-size: 14.5px;
 }
 
 #expenseForm input:focus {
     border-color: var(--primary);
+    box-shadow: var(--focus-ring);
 }
 
-#amount {
-    width: 140px;
-}
-
-#description {
-    width: 260px;
-}
+#amount { width: 140px; }
+#description { width: 260px; }
 
 #expenseForm button {
     margin-left: auto;
-
     padding: 12px 24px;
-
     border: none;
-    border-radius: 8px;
-
-    background: #2563eb;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
     color: #fff;
-
     cursor: pointer;
-
-    font-size: 15px;
-    font-weight: 600;
-
-    transition: 0.3s;
+    font-size: 14.5px;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
 }
 
-#expenseForm button:hover {
-    background: #1d4ed8;
-}
-
-#expenseForm button:active {
-    transform: scale(0.98);
-}
-
+#expenseForm button:hover { background: var(--primary-hover); }
+#expenseForm button:active { transform: scale(0.98); }
 
 #loading {
     text-align: center;
     margin: 20px;
+    color: var(--text-secondary);
+    font-size: 13.5px;
 }
 
 .spinner {
-    width: 35px;
-    height: 35px;
-
-    border: 4px solid #ddd;
-    border-top: 4px solid #2563eb;
-
+    width: 32px;
+    height: 32px;
+    border: 3.5px solid var(--surface-secondary);
+    border-top: 3.5px solid var(--primary);
     border-radius: 50%;
-
-    animation: spin 1s linear infinite;
-
-    margin: auto;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 10px;
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .spinner { animation-duration: 1.6s; }
 }
 
 .processing {
-    background: #6c757d !important;
+    background: var(--text-muted) !important;
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-
 h1 {
-    font-size: 36px;
-    color: #1f2937;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    color: var(--heading);
     margin: 20px 0;
 }
 
-
 .section-heading {
-    font-size: 20px;
-    margin-bottom: 16px;
-    color: #1f2937;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    color: var(--heading);
 }
 
-
+/* ---- Expense table ---- */
 .expense-table-card {
     width: 100%;
     margin: 20px 0 0;
-
-    background: var(--card);
+    background: var(--surface);
     color: var(--text);
-
     padding: 0;
-
-    border-radius: 12px;
-
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
 
@@ -224,103 +187,73 @@ h1 {
 .expense-table th {
     background: var(--primary);
     color: #fff;
-
     padding: 12px 14px;
-
     text-align: left;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 13px;
     white-space: nowrap;
 }
 
 .expense-table td {
     padding: 13px 14px;
-
     border-bottom: 1px solid var(--border);
-
     color: var(--text);
+    font-size: 14px;
 }
 
 .expense-table tbody tr:hover {
     background: var(--hover);
 }
 
-
 .delete-btn {
-    background: #dc3545;
+    background: var(--danger);
     color: #fff;
-
     border: none;
-
-    padding: 10px 18px;
-
-    border-radius: 8px;
-
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-
-    font-weight: 600;
-
-    transition: 0.3s;
+    font-weight: 700;
+    font-size: 13px;
 }
 
-.delete-btn:hover {
-    background: #b02a37;
-}
+.delete-btn:hover { filter: brightness(.92); }
+.delete-btn:active { transform: scale(0.98); }
 
-.delete-btn:active {
-    transform: scale(0.98);
-}
-
-
-
+/* ---- Pagination ---- */
 #pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-
     gap: 10px;
-
-    margin: 35px 0;
-
+    margin: 30px 0;
     flex-wrap: wrap;
 }
 
 .page-btn {
-    width: 42px;
-    height: 42px;
-
-    border-radius: 8px;
-
-    border: 1px solid #ddd;
-
-    background: #fff;
-
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
     cursor: pointer;
-
-    font-weight: 600;
-
-    transition: 0.3s;
+    font-weight: 700;
 }
 
-.page-btn:hover {
-    background: #2563eb;
-    color: #fff;
-}
-
-.page-btn.active {
-    background: #2563eb;
-    color: #fff;
-}
+.page-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
 #pagination span {
-    font-weight: bold;
-    color: #666;
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 13.5px;
 }
 
 @media (max-width: 768px) {
 
     .page-content {
         width: 94%;
-        padding: 30px 0 40px;
+        padding: 26px 0 40px;
     }
 
     #expenseForm {
@@ -338,39 +271,29 @@ h1 {
         width: 100%;
     }
 
-    #premiumMessage {
-        font-size: 30px;
-    }
-
-    h1 {
-        font-size: 32px;
-    }
+    #premiumMessage { font-size: 26px; }
+    h1 { font-size: 26px; }
 
     .top-controls {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .page-limit {
-        width: fit-content;
-    }
+    .page-limit { width: fit-content; }
 
-    .expense-table {
-        min-width: 700px;
-    }
-
+    .expense-table { min-width: 700px; }
 }
 
 .is-hidden { display: none !important; }
 
-/* Daily Insight widget */
+/* ---- Daily Insight widget ---- */
 .insight-card {
-    background: var(--card);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     padding: 18px 20px;
     margin: 0 0 22px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    box-shadow: var(--shadow-sm);
 }
 .insight-eyebrow {
     margin: 0 0 10px;
@@ -390,12 +313,12 @@ h1 {
 .insight-item {
     margin: 0;
     padding: 10px 14px;
-    border-radius: 10px;
-    background: rgba(127,127,127,.06);
+    border-radius: var(--radius-sm);
+    background: var(--surface-secondary);
     color: var(--text);
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.5;
 }
-.insight-item.insight-positive { border-left: 3px solid #16a34a; }
-.insight-item.insight-warning { border-left: 3px solid #d97706; }
+.insight-item.insight-positive { border-left: 3px solid var(--success); }
+.insight-item.insight-warning { border-left: 3px solid var(--warning); }
 .insight-item.insight-neutral { border-left: 3px solid var(--primary); }

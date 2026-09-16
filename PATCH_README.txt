@@ -1,22 +1,29 @@
-SMARTPAY SAVINGS V2 - DROP-IN PATCH
+# Smart Expense Tracker — UI Patch
 
-This patch is designed to be extracted DIRECTLY into your EXISTING project folder.
+This is a selective patch for the latest working project.
 
-It contains only the four files changed for the latest fixes:
-- controller/userController.js
-- public/css/payments.css
-- public/payments.html
-- services/demoPaymentService.js
+## Apply
+Extract the contents of this ZIP directly into the ROOT of your existing
+`smart-expense-tracker-full-Final` project folder and choose **Replace/Overwrite**
+when Windows asks.
 
-When Windows asks whether to replace files, choose Replace/Yes.
+Do NOT delete the existing project files and do NOT replace `.env`, `.git`,
+`node_modules`, backend files, models, routes, controllers, or package files.
 
-Do NOT extract the ZIP into a new smart-expense-tracker-full subfolder.
-Do NOT replace your .env.
-Do NOT replace node_modules.
+## Included
+Only frontend files changed by the Claude UI revision are included.
+The current backend/payment logic is intentionally preserved.
+
+## Validation performed
+- JavaScript syntax check passed for all changed JS files.
+- HTML parsing passed for all changed HTML files.
+- CSS brace/syntax-structure check passed.
+- CSS variables used by the changed styles are defined in theme.css.
+- No backend/controller/model/route/package files are included.
+- Existing SmartPay `.spending-guard` styles were preserved.
 
 After extraction:
-1. Restart nodemon.
-2. Open Payments.
-3. Confirm the normal shared header appears.
-4. Create a new user and confirm a SmartPay Payment ID is generated.
-5. Existing users will also receive a Payment ID when their wallet loads.
+1. Restart the Node.js server if it is running.
+2. Hard-refresh the browser (Ctrl+F5).
+3. Test login/signup, forgot/reset password, expenses, budget, reports,
+   leaderboard, and SmartPay wallet.

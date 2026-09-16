@@ -1,5 +1,6 @@
 const form = document.getElementById("forgotForm");
-
+const forgotMessage = document.getElementById("forgotMessage");
+const forgotSubmitBtn = document.getElementById("forgotSubmitBtn");
 
 form.addEventListener("submit", sendMail);
 
@@ -9,6 +10,9 @@ async function sendMail(e) {
 
     const email = document.getElementById("email").value;
 
+    if (forgotMessage) { forgotMessage.textContent = ""; forgotMessage.className = "auth-message"; }
+    if (forgotSubmitBtn) { forgotSubmitBtn.disabled = true; forgotSubmitBtn.textContent = "Sending..."; }
+
     try {
 
         const response = await axios.post(
@@ -16,14 +20,20 @@ async function sendMail(e) {
             { email }
         );
 
-        alert(response.data.message);
-        window.location.href = "login.html";
+        if (forgotMessage) {
+            forgotMessage.textContent = response.data.message || "Reset link sent. Check your email.";
+            forgotMessage.className = "auth-message is-success";
+        }
 
+        setTimeout(() => { window.location.href = "login.html"; }, 1400);
     }
     catch (err) {
 
-        alert(err.response?.data?.message || "Something went wrong");
-
+        if (forgotMessage) {
+            forgotMessage.textContent = err.response?.data?.message || "Something went wrong. Please try again.";
+            forgotMessage.className = "auth-message is-error";
+        }
+        if (forgotSubmitBtn) { forgotSubmitBtn.disabled = false; forgotSubmitBtn.textContent = "Send Reset Link"; }
     }
 
 }

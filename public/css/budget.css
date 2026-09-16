@@ -47,8 +47,8 @@ body {
 .budget-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, .07);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
 }
 
 .budget-overview-card {
@@ -88,18 +88,18 @@ body {
 }
 
 .budget-badge.good {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--success-soft);
+    color: var(--success);
 }
 
 .budget-badge.warning {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--warning-soft);
+    color: var(--warning);
 }
 
 .budget-badge.exceeded {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--danger-soft);
+    color: var(--danger);
 }
 
 .budget-overview-grid {
@@ -111,8 +111,8 @@ body {
 
 .budget-overview-stat {
     padding: 18px;
-    background: var(--secondary);
-    border-radius: 12px;
+    background: var(--surface-secondary);
+    border-radius: var(--radius-md);
 }
 
 .budget-label {
@@ -146,11 +146,11 @@ body {
 }
 
 .budget-progress-bar.warning {
-    background: #d97706;
+    background: var(--warning);
 }
 
 .budget-progress-bar.exceeded {
-    background: #dc2626;
+    background: var(--danger);
 }
 
 .budget-progress-meta {
@@ -186,7 +186,7 @@ body {
     box-sizing: border-box;
     padding: 11px 12px;
     border: 1px solid var(--input-border);
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
     background: var(--input-bg);
     color: var(--text);
     font: inherit;
@@ -196,6 +196,7 @@ body {
 .limit-field input:focus,
 .limit-field select:focus {
     border-color: var(--primary);
+    box-shadow: var(--focus-ring);
 }
 
 .limit-field small {
@@ -213,7 +214,7 @@ body {
 .secondary-btn,
 .danger-btn {
     border: 1px solid transparent;
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
     padding: 11px 17px;
     font: inherit;
     font-weight: 600;
@@ -223,6 +224,10 @@ body {
 .primary-btn {
     background: var(--primary);
     color: #fff;
+    box-shadow: var(--shadow-sm);
+}
+.primary-btn:hover:not(:disabled) {
+    background: var(--primary-hover);
 }
 
 .secondary-btn {
@@ -230,11 +235,17 @@ body {
     border-color: var(--border);
     color: var(--text);
 }
+.secondary-btn:hover:not(:disabled) {
+    background: var(--hover);
+}
 
 .danger-btn {
     background: transparent;
-    border-color: #fecaca;
-    color: #b91c1c;
+    border-color: var(--danger);
+    color: var(--danger);
+}
+.danger-btn:hover:not(:disabled) {
+    background: var(--danger-soft);
 }
 
 .primary-btn:disabled,
@@ -250,11 +261,11 @@ body {
 }
 
 .form-message.success {
-    color: #15803d;
+    color: var(--success);
 }
 
 .form-message.error {
-    color: #b91c1c;
+    color: var(--danger);
 }
 
 .status-grid {
@@ -266,10 +277,10 @@ body {
 
 .status-card {
     padding: 20px;
-    background: var(--card);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: 0 5px 18px rgba(0, 0, 0, .06);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
 .status-card h3 {
@@ -310,11 +321,11 @@ body {
 }
 
 .status-bar-fill.warning {
-    background: #d97706;
+    background: var(--warning);
 }
 
 .status-bar-fill.exceeded {
-    background: #dc2626;
+    background: var(--danger);
 }
 
 .category-list {
@@ -329,9 +340,9 @@ body {
     align-items: center;
     gap: 16px;
     padding: 16px 18px;
-    background: var(--card);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 .category-name {
@@ -354,8 +365,8 @@ body {
     margin-top: 30px;
     padding: 18px 20px;
     border-left: 4px solid var(--primary);
-    background: var(--secondary);
-    border-radius: 8px;
+    background: var(--primary-soft);
+    border-radius: var(--radius-sm);
 }
 
 .budget-note strong {
@@ -371,10 +382,10 @@ body {
 .empty-state {
     padding: 24px;
     text-align: center;
-    color: var(--muted);
-    background: var(--card);
+    color: var(--text-secondary);
+    background: var(--surface);
     border: 1px dashed var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 @media (max-width: 800px) {
@@ -431,24 +442,24 @@ body {
 
 
 .edit-limits-btn {
-    background: #2563eb;
+    background: var(--primary);
     color: #fff;
-    border-color: #2563eb;
+    border-color: var(--primary);
 }
 
 .edit-limits-btn:hover {
-    background: #1d4ed8;
+    background: var(--primary-hover);
 }
 
 .edit-limits-btn.editing {
-    background: #e5e7eb;
-    color: #111827;
-    border-color: #d1d5db;
+    background: var(--secondary);
+    color: var(--text);
+    border-color: var(--border);
 }
 
 .limit-field input:disabled {
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--secondary);
+    color: var(--text-secondary);
     cursor: not-allowed;
 }
 
@@ -470,9 +481,10 @@ body {
     position: relative;
     width: min(430px, 100%);
     padding: 28px;
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
 }
 
 .budget-modal-card h2 {
@@ -496,7 +508,7 @@ body {
 .budget-forgot-link {
     display: inline-block;
     margin-top: 16px;
-    color: #2563eb;
+    color: var(--primary);
     text-decoration: none;
 }
 

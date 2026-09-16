@@ -24,9 +24,9 @@ body {
     max-width: 560px;
     background: var(--card);
     padding: 42px 45px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     text-align: center;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-lg);
     border: 1px solid var(--border);
 }
 
@@ -57,9 +57,9 @@ body {
 
 .premium-benefits {
     text-align: left;
-    background: var(--hover);
+    background: var(--surface-secondary);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     padding: 22px 25px;
     margin-bottom: 28px;
 }
@@ -90,7 +90,7 @@ body {
 .dashboard-btn {
     width: 100%;
     padding: 13px 20px;
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
@@ -101,10 +101,11 @@ body {
     border: none;
     background: var(--primary);
     color: #ffffff;
+    box-shadow: var(--shadow-sm);
 }
 
 .upgrade-btn:hover {
-    opacity: 0.9;
+    background: var(--primary-hover);
     transform: translateY(-1px);
 }
 

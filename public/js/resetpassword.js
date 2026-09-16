@@ -81,12 +81,14 @@ passwordInput.addEventListener("input", function () {
 passwordInput.addEventListener("input", function () {
 
     passwordError.textContent = "";
+    passwordError.className = "auth-message";
 
 });
 
 confirmPasswordInput.addEventListener("input", function () {
 
     passwordError.textContent = "";
+    passwordError.className = "auth-message";
 
 });
 
@@ -112,6 +114,7 @@ async function updatePassword(e) {
 
     if (password.length < 5) {
 
+        passwordError.className = "auth-message is-error";
         passwordError.textContent =
             "Password must be at least 5 characters.";
 
@@ -123,6 +126,7 @@ async function updatePassword(e) {
 
     if (password !== confirmPassword) {
 
+        passwordError.className = "auth-message is-error";
         passwordError.textContent =
             "Passwords do not match.";
 
@@ -156,7 +160,7 @@ async function updatePassword(e) {
 
         /* Success */
 
-        passwordError.style.color = "#15803d";
+        passwordError.className = "auth-message is-success";
 
         passwordError.textContent =
             response.data.message ||
@@ -179,8 +183,7 @@ async function updatePassword(e) {
 
     } catch (err) {
 
-        passwordError.style.color =
-            "#dc3545";
+        passwordError.className = "auth-message is-error";
 
         passwordError.textContent =
             err.response?.data?.message ||

@@ -54,7 +54,9 @@ const showDetail = (transfer) => {
     const other = isSent ? transfer.receiverId : transfer.senderId;
     document.getElementById("detailEyebrow").textContent = isSent ? "SENT PAYMENT" : "MONEY RECEIVED";
     document.getElementById("detailTitle").textContent = isSent ? "Payment Details" : "Receipt Details";
-    document.getElementById("detailAmount").textContent = `${isSent ? "−" : "+"}${formatMoney(transfer.amountMinor)}`;
+    const detailAmountEl = document.getElementById("detailAmount");
+    detailAmountEl.textContent = `${isSent ? "−" : "+"}${formatMoney(transfer.amountMinor)}`;
+    detailAmountEl.className = isSent ? "amount-sent" : "amount-received";
     document.getElementById("detailOther").textContent = `${isSent ? "Paid to " : "Received from "}${other?.name || "SmartPay user"}`;
     document.getElementById("detailOtherPaymentId").textContent = other?.paymentId || "—";
     document.getElementById("detailRemark").textContent = transfer.remark || "—";
@@ -67,7 +69,10 @@ const showDetail = (transfer) => {
 const renderHistory = (transfers) => {
     activityData = Array.isArray(transfers) ? transfers : [];
     if (!activityData.length) {
-        demoTransferHistory.innerHTML = '<div class="payment-empty">No wallet activity yet.</div>';
+        demoTransferHistory.innerHTML = `<div class="payment-empty">
+            <p class="empty-state-title">No wallet activity yet</p>
+            <p class="empty-state-hint">Your SmartPay transactions will show up here once you send or receive money.</p>
+        </div>`;
         return;
     }
     demoTransferHistory.innerHTML = activityData.map((transfer, index) => {
@@ -76,11 +81,12 @@ const renderHistory = (transfers) => {
         const other = isSent ? transfer.receiverId : transfer.senderId;
         const name = other?.name || "SmartPay user";
         const id = other?.paymentId || "";
-        return `<button type="button" class="payment-row payment-row-button" data-activity-index="${index}">
-            <span><strong class="payment-amount">${isSent ? "−" : "+"}${formatMoney(transfer.amountMinor)}</strong>
+        const direction = isSent ? "sent" : "received";
+        return `<button type="button" class="payment-row payment-row-button payment-row-${direction}" data-activity-index="${index}">
+            <span><strong class="payment-amount payment-amount-${direction}">${isSent ? "−" : "+"}${formatMoney(transfer.amountMinor)}</strong>
             <small class="payment-label">${escapeHtml(isSent ? `Paid to ${name}` : `Received from ${name}`)}</small>
             ${id ? `<small class="payment-label">${escapeHtml(id)}</small>` : ""}</span>
-            <span class="payment-row-right"><small class="payment-type">${isSent ? "SENT" : "RECEIVED"}</small><span class="payment-time">${formatDate(transfer.createdAt)}</span></span>
+            <span class="payment-row-right"><small class="payment-type payment-type-${direction}">${isSent ? "SENT" : "RECEIVED"}</small><span class="payment-time">${formatDate(transfer.createdAt)}</span></span>
         </button>`;
     }).join("");
     demoTransferHistory.querySelectorAll("[data-activity-index]").forEach((row) => {
@@ -104,7 +110,7 @@ const loadWalletOnly = async () => {
         demoBalance.textContent = "—";
         demoPaymentId.textContent = "Unavailable";
         receivePaymentId.textContent = "Unavailable";
-        walletMessage.textContent = err.code === "ECONNABORTED" ? "Wallet is taking too long to respond. Please refresh." : (err.response?.data?.message || "Unable to load SmartPay Wallet.");
+        walletMessage.textContent = err.code === "ECONNABORTED" ? "Wallet is taking too long to respond. Please refresh." : (err.response?.data?.message || "Couldn't load your wallet. Please try again.");
         return null;
     }
 };
@@ -114,13 +120,16 @@ const loadActivity = async () => {
         const response = await api.get("/payments/demo/history?limit=10", { timeout: 8000 });
         renderHistory(response.data.transfers || []);
     } catch (err) {
-        demoTransferHistory.innerHTML = '<div class="payment-empty">Wallet activity could not be loaded. Your balance is still available above.</div>';
+        demoTransferHistory.innerHTML = `<div class="payment-empty">
+            <p class="empty-state-title">Couldn't load wallet activity</p>
+            <p class="empty-state-hint">Your balance above is still accurate. Try refreshing in a moment.</p>
+        </div>`;
     }
 };
 
 const loadWallet = async () => {
     walletMessage.textContent = "";
-    demoTransferHistory.innerHTML = '<div class="payment-empty">Loading wallet activity...</div>';
+    demoTransferHistory.innerHTML = '<div class="payment-empty payment-loading">Loading wallet activity...</div>';
     await Promise.allSettled([loadWalletOnly(), loadActivity()]);
 };
 

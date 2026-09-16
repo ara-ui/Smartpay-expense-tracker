@@ -62,8 +62,8 @@ body {
 }
 
 .acc-badge-premium {
-    background: #fff3cd;
-    color: #c28a00;
+    background: var(--warning-soft);
+    color: #b45309;
 }
 
 .acc-badge-free {
@@ -72,8 +72,8 @@ body {
 }
 
 .acc-badge-status {
-    background: #e7f8ee;
-    color: #1e8449;
+    background: var(--success-soft);
+    color: var(--success);
 }
 
 /* ---------------- BUTTONS ---------------- */
@@ -200,12 +200,12 @@ body {
 /* ---------------- STAT CARD ---------------- */
 
 .acc-stat-card {
-    background: var(--card);
+    background: var(--surface);
     color: var(--text);
     border: 1px solid var(--border);
     padding: 22px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     text-align: center;
 }
 
@@ -227,12 +227,12 @@ body {
 /* ---------------- SETTINGS SHORTCUT CARD ---------------- */
 
 .acc-shortcut-card {
-    background: var(--card);
+    background: var(--surface);
     color: var(--text);
     border: 1px solid var(--border);
     padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     gap: 14px;
@@ -243,7 +243,7 @@ body {
 
 .acc-shortcut-card:hover {
     background: var(--hover);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, .12);
+    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
 }
 
@@ -262,7 +262,7 @@ body {
 .password-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.55);
+    background: rgba(15, 23, 42, .55);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -277,9 +277,9 @@ body {
     background: var(--card);
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     padding: 30px;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
 }
 
 .password-modal-close {
@@ -329,7 +329,7 @@ body {
 
 .password-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, .1);
+    box-shadow: var(--focus-ring);
 }
 
 .password-strength {
@@ -359,17 +359,17 @@ body {
 }
 
 .password-error {
-    color: #dc3545;
+    color: var(--danger);
     font-size: 13px;
     margin: 10px 0;
 }
 
 .password-success-message {
-    background: #ecfdf5;
-    color: #166534;
-    border-left: 4px solid #22c55e;
+    background: var(--success-soft);
+    color: var(--success);
+    border-left: 4px solid var(--success);
     padding: 12px 14px;
-    border-radius: 7px;
+    border-radius: var(--radius-sm);
     font-size: 13px;
     margin-bottom: 18px;
 }
