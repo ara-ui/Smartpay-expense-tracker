@@ -17,7 +17,7 @@ const sendMail = async (receiverEmail, id) => {
 
             sender: {
                 email: "zurikara9@gmail.com",
-                name: "Expense Tracker"
+                name: "Smart Pay"
             },
 
             to: [
@@ -29,7 +29,7 @@ const sendMail = async (receiverEmail, id) => {
             subject: "Reset Your Password",
 
             htmlContent: `
-                <h2>Expense Tracker</h2>
+                <h2>Smart Pay</h2>
                 <p>Click the button below to reset your password.</p>
 
                 <a href="http://localhost:3000/password/resetpassword/${id}">
@@ -66,7 +66,7 @@ const sendChangePasswordOTP = async (receiverEmail, otp) => {
 
             sender: {
                 email: "zurikara9@gmail.com",
-                name: "Expense Tracker"
+                name: "Smart Pay"
             },
 
             to: [
@@ -75,7 +75,7 @@ const sendChangePasswordOTP = async (receiverEmail, otp) => {
                 }
             ],
 
-            subject: "Expense Tracker - Password Change Verification",
+            subject: "Smart Pay - Password Change Verification",
 
             htmlContent: `
                 <div style="
@@ -87,7 +87,7 @@ const sendChangePasswordOTP = async (receiverEmail, otp) => {
                     border-radius:10px;
                 ">
 
-                    <h2>Expense Tracker</h2>
+                    <h2>Smart Pay</h2>
 
                     <p>
                         You requested to change your password.
@@ -107,7 +107,7 @@ const sendChangePasswordOTP = async (receiverEmail, otp) => {
                     </div>
 
                     <p>
-                        Enter this code in the Expense Tracker
+                        Enter this code in the Smart Pay
                         application to complete the password change.
                     </p>
 

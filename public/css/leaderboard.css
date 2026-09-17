@@ -8,9 +8,8 @@ body { background: var(--bg); color: var(--text); visibility: hidden; }
 .period-button { border: 0; background: transparent; color: var(--text-secondary); border-radius: var(--radius-sm); padding: 9px 18px; font-weight: 700; cursor: pointer; }
 .period-button:hover { color: var(--primary); }
 .period-button.active { background: var(--primary); color: #fff; }
-.leaderboard-explainer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 15px 18px; margin-bottom: 18px; }
-.leaderboard-explainer strong { color: var(--heading); }
-.leaderboard-explainer p { margin: 5px 0 0; color: var(--text-secondary); font-size: 13px; }
+
+
 .champion-card { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
 .champion-icon { font-size: 36px; }
 .champion-label { margin: 0 0 3px; color: var(--primary); font-size: 10px; font-weight: 800; letter-spacing: .08em; }

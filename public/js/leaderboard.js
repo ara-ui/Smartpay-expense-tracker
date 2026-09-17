@@ -49,8 +49,6 @@ async function loadLeaderboard(period = selectedPeriod) {
         const currentUser = getCurrentUser();
         const currentUserId = currentUser?.id ? String(currentUser.id) : null;
 
-        document.getElementById("periodTitle").textContent =
-            `${period === "weekly" ? "Weekly" : "Monthly"} savings`;
 
         renderChampion(leaderboardData[0], period, currentUserId);
         renderLeaderboardPodium(leaderboardData, currentUserId);
