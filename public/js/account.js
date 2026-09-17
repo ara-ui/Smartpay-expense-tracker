@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     renderProfileCard(user);
     renderMembershipCard(user);
     renderQuickStats();
+    renderReportHistorySection(user);
     renderSettingsShortcuts();
 
 });
@@ -50,9 +51,6 @@ function renderProfileCard(user) {
                 <div class="acc-profile-meta">
                     ${badge}
                     <span class="acc-badge acc-badge-status">Active</span>
-                    <span class="acc-card-subtext">
-                        Joined <span class="acc-placeholder">Not available yet</span>
-                    </span>
                 </div>
 
             </div>
@@ -124,8 +122,7 @@ function renderMembershipCard(user) {
                 </div>
 
                 <p class="acc-card-subtext acc-membership-upgrade-text">
-                Upgrade to Premium to unlock advanced reports,
-                spending analytics, leaderboard, and exports.
+                Unlock reports, analytics, leaderboard and exports.
                 </p>
 
                 <button class="acc-btn" id="upgradeBtn">
@@ -263,6 +260,127 @@ async function loadQuickStats() {
 
 }
 
+// ---------------------------------------------------------------------
+// 5. REPORT DOWNLOAD HISTORY
+// ---------------------------------------------------------------------
+
+let reportHistoryPage = 1;
+
+function renderReportHistorySection(user) {
+
+    const section = document.getElementById("reportHistorySection");
+
+    // Report downloads are a Premium (Reports) feature - there is nothing
+    // to show a free user, so don't render the section or call the API.
+    if (!user.isPremiumUser) {
+        section.innerHTML = "";
+        return;
+    }
+
+    section.innerHTML = `
+        <div class="acc-card-title">🧾 Report Download History</div>
+        <div id="reportHistoryBody" class="report-history-body">
+            <div class="report-history-skeleton">
+                <span class="skeleton-line" style="width:70%"></span>
+                <span class="skeleton-line" style="width:45%"></span>
+                <span class="skeleton-line" style="width:60%"></span>
+            </div>
+        </div>
+    `;
+
+    loadReportHistory(1);
+
+}
+
+function reportHistoryFormatDate(isoDate) {
+    return new Date(isoDate).toLocaleDateString("en-IN", {
+        day: "numeric", month: "short", year: "numeric"
+    });
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function reportHistoryRedownloadUrl(record) {
+    const query = new URLSearchParams({ redownload: record.format, type: record.reportType });
+    if (record.params?.date) query.set("date", record.params.date);
+    if (record.params?.startDate) query.set("startDate", record.params.startDate);
+    if (record.params?.endDate) query.set("endDate", record.params.endDate);
+    return `reports.html?${query.toString()}`;
+}
+
+async function loadReportHistory(page) {
+
+    const body = document.getElementById("reportHistoryBody");
+    if (!body) return;
+
+    reportHistoryPage = page;
+
+    try {
+
+        const response = await api.get(`/expense/report-history?page=${page}&limit=10`);
+        const { history, totalPages } = response.data;
+
+        if (!history.length) {
+            body.innerHTML = `
+                <div class="empty-state">
+                    <p class="empty-state-title">No reports downloaded yet.</p>
+                    <p class="empty-state-hint">Reports you download from the Reports page will show up here.</p>
+                </div>
+            `;
+            return;
+        }
+
+        body.innerHTML = `
+            <ul class="report-history-list">
+                ${history.map((record) => `
+                    <li class="report-history-item">
+                        <div class="report-history-info">
+                            <span class="report-history-period">${escapeHtml(record.periodLabel)}</span>
+                            <span class="report-history-meta">
+                                Downloaded ${escapeHtml(reportHistoryFormatDate(record.createdAt))} • ${escapeHtml(String(record.format || "").toUpperCase())}
+                            </span>
+                        </div>
+                        <a class="report-history-again" href="${escapeHtml(reportHistoryRedownloadUrl(record))}">Download Again</a>
+                    </li>
+                `).join("")}
+            </ul>
+            ${totalPages > 1 ? `
+                <div class="report-history-pagination">
+                    <button type="button" id="reportHistoryPrev" ${page <= 1 ? "disabled" : ""}>Previous</button>
+                    <span>Page ${page} of ${totalPages}</span>
+                    <button type="button" id="reportHistoryNext" ${page >= totalPages ? "disabled" : ""}>Next</button>
+                </div>
+            ` : ""}
+        `;
+
+        const prevBtn = document.getElementById("reportHistoryPrev");
+        const nextBtn = document.getElementById("reportHistoryNext");
+        if (prevBtn) prevBtn.addEventListener("click", () => loadReportHistory(page - 1));
+        if (nextBtn) nextBtn.addEventListener("click", () => loadReportHistory(page + 1));
+
+    } catch (err) {
+
+        console.log(err);
+        body.innerHTML = `
+            <div class="empty-state">
+                <p class="empty-state-title">Couldn't load report history.</p>
+                <button type="button" class="report-history-retry" id="reportHistoryRetry">Retry</button>
+            </div>
+        `;
+        const retryBtn = document.getElementById("reportHistoryRetry");
+        if (retryBtn) retryBtn.addEventListener("click", () => loadReportHistory(reportHistoryPage));
+
+    }
+
+}
+
 function renderSettingsShortcuts() {
 
     document.getElementById("settingsShortcutsSection").innerHTML = `
@@ -285,19 +403,6 @@ function renderSettingsShortcuts() {
 
             </button>
 
-            <button class="acc-shortcut-card" type="button">
-
-                <span class="acc-shortcut-icon">🔔</span>
-                <span class="acc-shortcut-label">Notifications</span>
-
-            </button>
-
-            <button class="acc-shortcut-card" type="button">
-
-                <span class="acc-shortcut-icon">🔒</span>
-                <span class="acc-shortcut-label">Privacy</span>
-
-            </button>
 
         </div>
 

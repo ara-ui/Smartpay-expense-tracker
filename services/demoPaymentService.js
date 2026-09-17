@@ -4,8 +4,9 @@ const User = require("../model/User");
 const Expense = require("../model/Expense");
 const DemoTransfer = require("../model/DemoTransfer");
 const { Transaction } = require("../model");
-const { enforceExpenseBudget, amountToPaise } = require("./budgetService");
+const { enforceExpenseBudget, amountToPaise, notifyBudgetThresholds } = require("./budgetService");
 const { getLocalCategory } = require("./aiService");
+const { notify } = require("./notificationService");
 
 const DEMO_ENABLED = String(process.env.DEMO_PAYMENTS_ENABLED ?? "true").toLowerCase() !== "false";
 const INITIAL_BALANCE_MINOR = 1000000; // ₹10,000 virtual demo balance
@@ -99,6 +100,9 @@ const transferDemoCredits = async ({ userId, recipientPaymentId, amount, remark,
     const session = await mongoose.startSession();
     try {
         let transfer;
+        let budgetChecks = [];
+        let senderInfo = null;
+        let receiverInfo = null;
         await session.withTransaction(async () => {
             const sender = await User.findById(userId).select("name email paymentId demoBalanceMinor").session(session);
             if (!sender) throw Object.assign(new Error("Sender not found"), { code: "USER_NOT_FOUND" });
@@ -123,12 +127,13 @@ const transferDemoCredits = async ({ userId, recipientPaymentId, amount, remark,
                 });
             }
 
-            await enforceExpenseBudget({
+            const budgetResult = await enforceExpenseBudget({
                 userId: sender._id,
                 amount: amountMinor / 100,
                 category: "Other",
                 session
             });
+            budgetChecks = budgetResult.checks;
 
             sender.demoBalanceMinor -= amountMinor;
             receiver.demoBalanceMinor += amountMinor;
@@ -181,11 +186,36 @@ const transferDemoCredits = async ({ userId, recipientPaymentId, amount, remark,
                 paymentMethod: "DEMO_TRANSFER",
                 transactionDate: new Date()
             }], { session });
+
+            senderInfo = { id: sender._id, name: sender.name };
+            receiverInfo = { id: receiver._id, name: receiver.name };
         });
 
         const fresh = await DemoTransfer.findById(transfer._id)
             .populate("receiverId", "name email")
             .lean();
+
+        // Non-critical side effects - fired only after the money transfer
+        // has actually committed, never inside the transaction itself.
+        const rupees = (amountMinor / 100).toFixed(2);
+        notify({
+            userId: senderInfo.id,
+            type: "MONEY_SENT",
+            title: "Money sent",
+            message: `₹${rupees} was sent to ${receiverInfo.name}.`,
+            amountMinor,
+            relatedTransferId: transfer._id
+        }).catch(() => {});
+        notify({
+            userId: receiverInfo.id,
+            type: "MONEY_RECEIVED",
+            title: "Money received",
+            message: `You received ₹${rupees} from ${senderInfo.name}.`,
+            amountMinor,
+            relatedTransferId: transfer._id
+        }).catch(() => {});
+        notifyBudgetThresholds(senderInfo.id, budgetChecks).catch(() => {});
+
         return { transfer: fresh, reused: false };
     } catch (err) {
         if (err.code === 11000) {

@@ -14,6 +14,7 @@ const demoTransferAmount = document.getElementById("demoTransferAmount");
 const demoTransferRemark = document.getElementById("demoTransferRemark");
 const demoTransferButton = document.getElementById("demoTransferButton");
 const demoTransferMessage = document.getElementById("demoTransferMessage");
+const retryWalletButton = document.getElementById("retryWalletButton");
 
 const formatMoney = (minor) => `₹${(Number(minor || 0) / 100).toFixed(2)}`;
 const formatDate = (value) => new Date(value).toLocaleString("en-IN", {
@@ -22,6 +23,27 @@ const formatDate = (value) => new Date(value).toLocaleString("en-IN", {
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+// Last-known wallet snapshot, keyed to the current session's token so it
+// never leaks between different logged-in users on the same browser. Used
+// only to paint the balance/Payment ID instantly on page load while the
+// real, authoritative fetch is still in flight - never as a substitute
+// for it.
+const walletCacheKey = () => `smartpay_wallet_cache:${localStorage.getItem("token") || ""}`;
+const readWalletCache = () => {
+    try {
+        const raw = localStorage.getItem(walletCacheKey());
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+};
+const writeWalletCache = (wallet) => {
+    try {
+        localStorage.setItem(walletCacheKey(), JSON.stringify({
+            balanceMinor: wallet.balanceMinor,
+            paymentId: wallet.paymentId
+        }));
+    } catch { /* localStorage unavailable - cache is a nice-to-have only */ }
+};
 
 let currentPaymentId = "";
 let currentEmail = "";
@@ -71,7 +93,7 @@ const renderHistory = (transfers) => {
     if (!activityData.length) {
         demoTransferHistory.innerHTML = `<div class="payment-empty">
             <p class="empty-state-title">No wallet activity yet</p>
-            <p class="empty-state-hint">Your SmartPay transactions will show up here once you send or receive money.</p>
+
         </div>`;
         return;
     }
@@ -104,6 +126,8 @@ const loadWalletOnly = async () => {
         demoBalance.textContent = formatMoney(wallet.balanceMinor);
         demoPaymentId.textContent = wallet.paymentId || "Unavailable";
         receivePaymentId.textContent = wallet.paymentId || "Unavailable";
+        retryWalletButton.hidden = true;
+        writeWalletCache(wallet);
         return wallet;
     } catch (err) {
         if (err.response?.status === 403) { window.location.replace("premium-required.html?return=payments.html"); return null; }
@@ -111,6 +135,7 @@ const loadWalletOnly = async () => {
         demoPaymentId.textContent = "Unavailable";
         receivePaymentId.textContent = "Unavailable";
         walletMessage.textContent = err.code === "ECONNABORTED" ? "Wallet is taking too long to respond. Please refresh." : (err.response?.data?.message || "Couldn't load your wallet. Please try again.");
+        retryWalletButton.hidden = false;
         return null;
     }
 };
@@ -129,9 +154,24 @@ const loadActivity = async () => {
 
 const loadWallet = async () => {
     walletMessage.textContent = "";
+    retryWalletButton.hidden = true;
     demoTransferHistory.innerHTML = '<div class="payment-empty payment-loading">Loading wallet activity...</div>';
     await Promise.allSettled([loadWalletOnly(), loadActivity()]);
 };
+
+// Paint the last-known balance/Payment ID instantly (if we have one for
+// this session) so the page never sits on a bare skeleton while the real,
+// authoritative fetch below is already on its way in parallel.
+const cachedWallet = readWalletCache();
+if (cachedWallet) {
+    if (typeof cachedWallet.balanceMinor === "number") demoBalance.textContent = formatMoney(cachedWallet.balanceMinor);
+    if (cachedWallet.paymentId) {
+        demoPaymentId.textContent = cachedWallet.paymentId;
+        receivePaymentId.textContent = cachedWallet.paymentId;
+    }
+}
+
+retryWalletButton.addEventListener("click", loadWalletOnly);
 
 sendMoneyButton.addEventListener("click", () => {
     demoTransferMessage.textContent = "";

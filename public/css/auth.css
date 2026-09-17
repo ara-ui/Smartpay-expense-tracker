@@ -1,6 +1,3 @@
-/* Shared auth-page shell. Used by login, signup, forgot-password and
-   reset-password. Built entirely on theme.css design tokens so it stays
-   in sync with the rest of the product and with the dark theme. */
 
 body.auth-page {
     min-height: 100vh;

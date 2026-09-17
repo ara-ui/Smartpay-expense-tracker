@@ -8,13 +8,31 @@
 
         <div class="header-right">
 
-            <button class="notification-btn" id="notificationBtn" type="button" aria-label="Notifications">
-                🔔
-            </button>
-
             <a class="payment-btn" id="paymentNavLink" href="payments.html" aria-label="SmartPay Wallet" title="SmartPay Wallet">
                 💳
             </a>
+
+            <div class="notification-area" id="notificationArea">
+
+                <button class="notification-btn" id="notificationBtn" type="button" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
+                    🔔
+                    <span class="notification-badge" id="notificationBadge" hidden>0</span>
+                </button>
+
+                <div class="notification-dropdown" id="notificationDropdown" hidden role="menu" aria-label="Notifications">
+
+                    <div class="notification-dropdown-head">
+                        <h3>Notifications</h3>
+                        <button type="button" class="notification-mark-all" id="notificationMarkAll">Mark all as read</button>
+                    </div>
+
+                    <div class="notification-list" id="notificationList">
+                        <div class="notification-empty">Loading notifications...</div>
+                    </div>
+
+                </div>
+
+            </div>
 
             <div class="account-area" id="accountArea">
 
@@ -77,16 +95,16 @@
             🏠 Dashboard
         </a>
 
+        <a href="budget.html" class="nav-link premium-gated-nav" data-page="budget" data-premium-page="budget.html">
+            💰 Budget <span class="nav-lock" aria-hidden="true">🔒</span>
+        </a>
+
         <a href="leaderboard.html" class="nav-link premium-gated-nav" data-page="leaderboard" data-premium-page="leaderboard.html">
             🏆 Leaderboard <span class="nav-lock" aria-hidden="true">🔒</span>
         </a>
 
         <a href="reports.html" class="nav-link premium-gated-nav" data-page="reports" data-premium-page="reports.html">
             📊 Reports <span class="nav-lock" aria-hidden="true">🔒</span>
-        </a>
-
-        <a href="budget.html" class="nav-link premium-gated-nav" data-page="budget" data-premium-page="budget.html">
-            💰 Budget <span class="nav-lock" aria-hidden="true">🔒</span>
         </a>
 
     </div>

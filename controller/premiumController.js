@@ -10,8 +10,6 @@ const getSavingsLeaderboard = async (period) => {
     const { start, end } = getPeriodBounds(period, now);
     const limitField = `${period}LimitPaise`;
 
-    // Only users who have explicitly configured a budget for the selected
-    // period participate. Savings = configured limit - actual expenses.
     const budgetRules = await BudgetRule.find({
         [limitField]: { $gt: 0 }
     }).select(`userId ${limitField}`).lean();

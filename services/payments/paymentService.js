@@ -258,6 +258,7 @@ const verifyAndApply = async ({ orderId, userId }) => {
     const session = await mongoose.startSession();
     try {
         let finalized = false;
+        let purposeEffectResult = null;
         await session.withTransaction(async () => {
             const current = await Order.findOneAndUpdate(
                 { _id: order._id, status: "PROCESSING" },
@@ -280,8 +281,18 @@ const verifyAndApply = async ({ orderId, userId }) => {
                 session
             });
 
-            await applyPurposeEffect({ order: current, session });
+            purposeEffectResult = await applyPurposeEffect({ order: current, session });
         });
+
+        // Budget notifications are non-critical side effects. Fire them only
+        // after the payment transaction has committed so a notification
+        // failure can never roll back a successful Cashfree payment/expense.
+        if (finalized && purposeEffectResult?.budgetChecks?.length) {
+            const { notifyBudgetThresholds } = require("../budgetService");
+            notifyBudgetThresholds(order.userId, purposeEffectResult.budgetChecks).catch((err) => {
+                console.log("Budget notification failed:", err.message);
+            });
+        }
 
         if (!finalized) {
             const current = await getOrderForUser(orderId, userId);

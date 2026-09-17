@@ -8,6 +8,8 @@ const BudgetUsage = require("./BudgetUsage");
 const Transaction = require("./Transaction");
 const WebhookEvent = require("./WebhookEvent");
 const DemoTransfer = require("./DemoTransfer");
+const Notification = require("./Notification");
+const ReportDownload = require("./ReportDownload");
 
 module.exports = {
     User,
@@ -19,5 +21,7 @@ module.exports = {
     BudgetUsage,
     Transaction,
     WebhookEvent,
-    DemoTransfer
+    DemoTransfer,
+    Notification,
+    ReportDownload
 };

@@ -140,7 +140,7 @@ async function getIncome() {
 }
 
 
-function updateDisplay() {
+async function updateDisplay() {
 
     if (currentView === "daily") {
 
@@ -182,7 +182,7 @@ function updateDisplay() {
 
     }
 
-    getReport();
+    return getReport();
 
 }
 
@@ -464,7 +464,43 @@ async function getReport() {
 
 toggleFilterControls();
 
-updateDisplay();
+// "Download Again" from Account > Report Download History links here with
+// the original report's parameters instead of a stored file, so the exact
+// same report is regenerated from live data and then downloaded again.
+(function applyRedownloadFromAccount() {
+    const query = new URLSearchParams(window.location.search);
+    const redownloadFormat = query.get("redownload");
+    if (!redownloadFormat) {
+        updateDisplay();
+        return;
+    }
+
+    const type = query.get("type");
+    if (type === "custom") {
+        customRangeActive = true;
+        customStartDate = query.get("startDate");
+        customEndDate = query.get("endDate");
+        startDateInput.value = customStartDate || "";
+        endDateInput.value = customEndDate || "";
+        currentView = "custom";
+        tabs.forEach((t) => t.classList.remove("active"));
+        toggleFilterControls();
+    } else if (type) {
+        currentView = type;
+        lastNonCustomView = type;
+        const dateParam = query.get("date");
+        if (dateParam) currentDate = new Date(dateParam);
+        tabs.forEach((t) => t.classList.toggle("active", t.dataset.view === type));
+    }
+
+    updateDisplay().then(() => {
+        if (redownloadFormat === "pdf") exportPDF();
+        else exportCSV();
+        // Clean the URL so refreshing the page doesn't re-trigger a download.
+        window.history.replaceState({}, "", "reports.html");
+    });
+})();
+
 
 
 function updateStatistics(expenses, totalExpense) {
@@ -690,8 +726,84 @@ function getReportPeriodLabel() {
 }
 
 
+// Builds a meaningful, deterministic, filesystem-safe filename based on the
+// selected reporting period (never "report.pdf"/"download.pdf").
+function buildReportFilename(format) {
+
+    const monthYear = (date) => date.toLocaleDateString("en-US", { month: "long", year: "numeric" }).replace(" ", "-");
+
+    if (customRangeActive) {
+        const start = new Date(customStartDate);
+        const end = new Date(customEndDate);
+        const fmt = (d) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }).replace(/,/g, "").replace(/ /g, "-");
+        return `Expense-Report-${fmt(start)}-to-${fmt(end)}.${format}`;
+    }
+
+    if (currentView === "daily") {
+        const d = currentDate.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" }).replace(/,/g, "").replace(/ /g, "-");
+        return `Expense-Report-${d}.${format}`;
+    }
+
+    if (currentView === "weekly") {
+        const start = new Date(currentDate);
+        start.setDate(currentDate.getDate() - currentDate.getDay());
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        const fmt = (d) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }).replace(/,/g, "").replace(/ /g, "-");
+        return `Expense-Report-Week-${fmt(start)}-to-${fmt(end)}.${format}`;
+    }
+
+    if (currentView === "monthly") {
+        return `Expense-Report-${monthYear(currentDate)}.${format}`;
+    }
+
+    return `Expense-Report-${currentDate.getFullYear()}.${format}`;
+}
+
+// Records a successful download in Report Download History (Account page).
+// Called only after the file has actually been handed to the browser to
+// save - never merely because the report page was viewed. Failures here
+// never block or roll back the download itself.
+async function recordReportDownload(format) {
+    try {
+        let dateParam = null;
+        if (!customRangeActive) {
+            if (currentView === "daily") dateParam = formatDate(currentDate);
+            else if (currentView === "weekly") {
+                const start = new Date(currentDate);
+                start.setDate(currentDate.getDate() - currentDate.getDay());
+                dateParam = formatDate(start);
+            } else if (currentView === "monthly") {
+                dateParam = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-01`;
+            } else {
+                dateParam = `${currentDate.getFullYear()}-01-01`;
+            }
+        }
+
+        await axios.post(
+            `${BASE_URL}/expense/report-history`,
+            {
+                reportType: customRangeActive ? "custom" : currentView,
+                periodLabel: getReportPeriodLabel(),
+                filename: buildReportFilename(format),
+                format,
+                params: customRangeActive
+                    ? { date: null, startDate: customStartDate, endDate: customEndDate }
+                    : { date: dateParam, startDate: null, endDate: null }
+            },
+            { headers: { Authorization: token } }
+        );
+    } catch (err) {
+        // Non-critical: the download itself already succeeded.
+        console.log("Could not record report download history:", err.message);
+    }
+}
+
+let isExporting = false;
 
 function exportCSV() {
+
+    if (isExporting) return;
 
     const expenses = currentReportData.expenses;
 
@@ -701,6 +813,13 @@ function exportCSV() {
         return;
 
     }
+
+    // Lock the CSV export immediately so double-clicks cannot trigger
+    // duplicate downloads/history records.
+    isExporting = true;
+    exportCsvBtn.disabled = true;
+
+    try {
 
     const totalExpense = currentReportData.totalExpense;
     const income = currentReportData.income;
@@ -833,8 +952,7 @@ function exportCSV() {
 
     link.href = url;
 
-    link.download =
-        `expense-report-${formatDate(new Date())}.csv`;
+    link.download = buildReportFilename("csv");
 
     document.body.appendChild(link);
 
@@ -844,10 +962,24 @@ function exportCSV() {
 
     URL.revokeObjectURL(url);
 
+    recordReportDownload("csv").finally(() => {
+        isExporting = false;
+        exportCsvBtn.disabled = false;
+    });
+
+    } catch (err) {
+        console.log("CSV export failed:", err);
+        isExporting = false;
+        exportCsvBtn.disabled = false;
+        alert("Could not create the CSV report. Please try again.");
+    }
+
 }
 
 
 function exportPDF() {
+
+    if (isExporting) return;
 
     const expenses = currentReportData.expenses;
 
@@ -857,6 +989,9 @@ function exportPDF() {
         return;
 
     }
+
+    isExporting = true;
+    exportPdfBtn.disabled = true;
 
 
     const { jsPDF } = window.jspdf;
@@ -1212,7 +1347,7 @@ const pdfUrl = URL.createObjectURL(pdfBlob);
 const downloadLink = document.createElement("a");
 
 downloadLink.href = pdfUrl;
-downloadLink.download = `expense-report-${formatDate(new Date())}.pdf`;
+downloadLink.download = buildReportFilename("pdf");
 
 document.body.appendChild(downloadLink);
 
@@ -1223,5 +1358,10 @@ document.body.removeChild(downloadLink);
 setTimeout(() => {
     URL.revokeObjectURL(pdfUrl);
 }, 1000);
+
+recordReportDownload("pdf").finally(() => {
+    isExporting = false;
+    exportPdfBtn.disabled = false;
+});
 
 }

@@ -5,7 +5,8 @@ const {
     BudgetExceededError,
     amountToPaise,
     enforceExpenseBudget,
-    reverseExpenseBudget
+    reverseExpenseBudget,
+    notifyBudgetThresholds
 } = require("../services/budgetService");
 
 
@@ -45,18 +46,20 @@ const addExpense = async (req, res) => {
         if (!CATEGORIES.includes(category)) category = "Other";
 
         let expense;
+        let budgetChecks = [];
         try {
             await session.withTransaction(async () => {
                 // Budget enforcement and the expense + totalExpense updates
                 // happen in one MongoDB transaction. BudgetUsage writes are
                 // therefore rolled back automatically if expense creation or
                 // the user update fails.
-                await enforceExpenseBudget({
+                const budgetResult = await enforceExpenseBudget({
                     userId: req.user._id,
                     amount: numericAmount,
                     category,
                     session
                 });
+                budgetChecks = budgetResult.checks;
 
                 const created = await Expense.create(
                     [{
@@ -86,6 +89,13 @@ const addExpense = async (req, res) => {
             }
             throw err;
         }
+
+        // Non-critical side effect - fires after the transaction has
+        // committed, so a notification hiccup can never roll back a
+        // successfully recorded expense.
+        notifyBudgetThresholds(req.user._id, budgetChecks).catch((err) => {
+            console.log("Budget notification failed:", err.message);
+        });
 
         res.status(201).json({
             success: true,

@@ -314,7 +314,8 @@ async function enforceExpenseBudget({ userId, amount, category, session, date = 
             category: rule.category,
             limitPaise: rule.limitPaise,
             spentPaise: projected,
-            remainingPaise: rule.limitPaise - projected
+            remainingPaise: rule.limitPaise - projected,
+            periodKey
         });
     }
 
@@ -459,6 +460,47 @@ async function getDailyInsights(userId, date = new Date()) {
     return { insights: insights.slice(0, 3) };
 }
 
+// Fires budget-threshold notifications (80% alert, 100% exceeded) for the
+// checks returned by enforceExpenseBudget, once a caller's transaction has
+// already committed. Deduped at the database level by the Notification
+// model's partial unique index on (userId, type, relatedCategory, period),
+// so this is always safe to call - it will never create a second
+// notification for the same threshold within the same period.
+async function notifyBudgetThresholds(userId, checks) {
+    if (!Array.isArray(checks) || !checks.length) return;
+    const { notify } = require("./notificationService");
+
+    for (const check of checks) {
+        if (!check.limitPaise || !check.periodKey) continue;
+        const ratio = check.spentPaise / check.limitPaise;
+        if (ratio < 0.8) continue;
+
+        const label = check.category ? `${check.category} budget` : `${check.period} budget`;
+        const relatedCategory = check.category || "OVERALL";
+        const period = `${check.period}:${check.periodKey}`;
+
+        if (ratio >= 1) {
+            await notify({
+                userId,
+                type: "BUDGET_EXCEEDED",
+                title: "Budget exceeded",
+                message: `Your ${label} has been exceeded.`,
+                relatedCategory,
+                period
+            });
+        } else {
+            await notify({
+                userId,
+                type: "BUDGET_ALERT",
+                title: "Budget alert",
+                message: `You've used ${Math.round(ratio * 100)}% of your ${label}.`,
+                relatedCategory,
+                period
+            });
+        }
+    }
+}
+
 module.exports = {
     BudgetExceededError,
     amountToPaise,
@@ -469,5 +511,6 @@ module.exports = {
     getDailyInsights,
     getOrCreateBudgetRule,
     getPeriodInfo,
-    getPeriodBounds
+    getPeriodBounds,
+    notifyBudgetThresholds
 };

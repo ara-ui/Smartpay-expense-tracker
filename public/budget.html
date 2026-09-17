@@ -17,9 +17,7 @@
             <div>
                 <p class="budget-eyebrow">SPENDING PLAN</p>
                 <h1>Budget</h1>
-                <p class="budget-intro">
-                    Set clear spending limits and see how much you can still spend.
-                </p>
+
             </div>
         </header>
 
@@ -62,7 +60,7 @@
             <div class="section-heading-row">
                 <div>
                     <h2 id="overallLimitsTitle">Overall Spending Limits</h2>
-                    <p>These limits apply to all expenses.</p>
+
                 </div>
             </div>
 
@@ -71,19 +69,19 @@
                     <label class="limit-field">
                         <span>Daily limit (₹)</span>
                         <input id="dailyLimitInput" type="number" min="0.01" step="0.01" placeholder="Not set">
-                        <small>Maximum spending in one day.</small>
+
                     </label>
 
                     <label class="limit-field">
                         <span>Weekly limit (₹)</span>
                         <input id="weeklyLimitInput" type="number" min="0.01" step="0.01" placeholder="Not set">
-                        <small>Monday through Sunday.</small>
+
                     </label>
 
                     <label class="limit-field">
                         <span>Monthly limit (₹)</span>
                         <input id="monthlyLimitInput" type="number" min="0.01" step="0.01" placeholder="Not set">
-                        <small>Current calendar month.</small>
+
                     </label>
                 </div>
 
@@ -100,7 +98,7 @@
             <div class="section-heading-row">
                 <div>
                     <h2 id="periodStatusTitle">Current Spending</h2>
-                    <p>Track your daily, weekly, and monthly allowance.</p>
+
                 </div>
             </div>
 
@@ -111,7 +109,7 @@
             <div class="section-heading-row">
                 <div>
                     <h2 id="categoryLimitsTitle">Category Limits</h2>
-                    <p>Give important categories their own spending caps.</p>
+
                 </div>
             </div>
 
@@ -147,12 +145,7 @@
         </section>
 
         <section class="budget-note">
-            <strong>How budget enforcement works</strong>
-            <p>
-                A new expense must pass every applicable daily, weekly, monthly,
-                and category limit. The backend enforces these rules, so changing
-                the browser cannot bypass a budget.
-            </p>
+            <strong>Limits are enforced automatically.</strong>
         </section>
     </main>
 
@@ -160,7 +153,6 @@
         <div class="budget-modal-card" role="dialog" aria-modal="true" aria-labelledby="budgetPasswordTitle">
             <button type="button" class="budget-modal-close" id="budgetPasswordClose" aria-label="Close">×</button>
             <h2 id="budgetPasswordTitle">🔐 Verify your password</h2>
-            <p>Budget changes require a quick identity check.</p>
             <form id="budgetPasswordForm">
                 <label class="limit-field">
                     <span>Account password</span>

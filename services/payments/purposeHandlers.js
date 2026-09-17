@@ -15,7 +15,7 @@ const handlers = {
     },
 
     EXPENSE_PAYMENT: async ({ order, session }) => {
-        await createExpenseFromPayment({ order, session });
+        return createExpenseFromPayment({ order, session });
     }
 };
 

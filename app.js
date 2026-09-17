@@ -31,6 +31,7 @@ const reportsRoutes = require("./routes/reportsRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const demoPaymentRoutes = require("./routes/demoPaymentRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 
@@ -71,6 +72,7 @@ app.use("/expense", reportsRoutes);
 app.use("/budget", budgetRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/payments/demo", demoPaymentRoutes);
+app.use("/notifications", notificationRoutes);
 
 // central error handler - must be registered after all routes
 app.use(errorHandler);

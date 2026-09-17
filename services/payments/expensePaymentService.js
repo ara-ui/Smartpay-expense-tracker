@@ -49,7 +49,7 @@ const createExpenseFromPayment = async ({ order, session }) => {
     const category = order.expenseCategory || "Other";
 
     // The same budget enforcement used by manual expenses is applied here.
-    await enforceExpenseBudget({
+    const budgetResult = await enforceExpenseBudget({
         userId: order.userId,
         amount,
         category,
@@ -81,7 +81,10 @@ const createExpenseFromPayment = async ({ order, session }) => {
         { session }
     );
 
-    return expense;
+    return {
+        expense,
+        budgetChecks: budgetResult?.checks || []
+    };
 };
 
 module.exports = {
