@@ -22,8 +22,18 @@ const createUser = async (req, res) => {
             });
         }
 
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const emailPattern = /^\\S+@\\S+\\.\\S+$/;
+
+        if (!emailPattern.test(normalizedEmail)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email address"
+            });
+        }
+
         const existingUser = await User.findOne({
-            email
+            email: normalizedEmail
         });
 
         if (existingUser) {
@@ -40,7 +50,7 @@ const createUser = async (req, res) => {
 
         const user = await User.create({
             name,
-            email,
+            email: normalizedEmail,
             password: hash
         });
 
@@ -80,8 +90,18 @@ const loginUser = async (req, res) => {
                 message: "Email and password are required"
             });
         }
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const emailPattern = /^\\S+@\\S+\\.\\S+$/;
+
+        if (!emailPattern.test(normalizedEmail)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email address"
+            });
+        }
+
         const user = await User.findOne({
-            email
+            email: normalizedEmail
         });
 
         if (!user) {

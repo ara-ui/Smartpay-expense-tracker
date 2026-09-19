@@ -18,6 +18,19 @@ async function addUser(e) {
 
     };
 
+    userDetails.name = userDetails.name.trim();
+    userDetails.email = userDetails.email.trim().toLowerCase();
+
+    const emailPattern = /^\\S+@\\S+\\.\\S+$/;
+
+    if (!emailPattern.test(userDetails.email)) {
+        if (signupMessage) {
+            signupMessage.textContent = "Please enter a valid email address.";
+            signupMessage.className = "auth-message is-error";
+        }
+        return;
+    }
+
     if (signupMessage) { signupMessage.textContent = ""; signupMessage.className = "auth-message"; }
     if (signupSubmitBtn) { signupSubmitBtn.disabled = true; signupSubmitBtn.textContent = "Creating account..."; }
 

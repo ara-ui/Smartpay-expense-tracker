@@ -4,7 +4,12 @@ const expenseSchema = new mongoose.Schema(
   {
     amount: {
       type: Number,
-      required: true
+      required: true,
+      min: 0.01,
+      validate: {
+        validator: Number.isFinite,
+        message: "Amount must be a valid number"
+      }
     },
 
     description: {
@@ -33,7 +38,7 @@ const expenseSchema = new mongoose.Schema(
 
 // Budget-period and category queries use these indexes when rebuilding or
 // reconciling BudgetUsage from existing expenses.
-expenseSchema.index({ userId: 1, createdAt: 1 });
+expenseSchema.index({ userId: 1, createdAt: -1 });
 expenseSchema.index({ userId: 1, category: 1, createdAt: 1 });
 
 module.exports = mongoose.model("Expense", expenseSchema);

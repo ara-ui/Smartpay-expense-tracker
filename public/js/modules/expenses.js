@@ -17,14 +17,35 @@ async function addExpense(e){
     //show loading
     document.getElementById("loading").style.display = "block";
 
+    const amountInput = document.getElementById("amount");
+    const descriptionInput = document.getElementById("description");
+
+    const numericAmount = Number(amountInput.value);
+    const description = descriptionInput.value.trim();
+
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+        addBtn.disabled = false;
+        addBtn.textContent = "Add Expense";
+        addBtn.classList.remove("processing");
+        document.getElementById("loading").style.display = "none";
+        alert("Please enter a valid expense amount greater than 0.");
+        amountInput.focus();
+        return;
+    }
+
+    if (!description) {
+        addBtn.disabled = false;
+        addBtn.textContent = "Add Expense";
+        addBtn.classList.remove("processing");
+        document.getElementById("loading").style.display = "none";
+        alert("Please enter an expense description.");
+        descriptionInput.focus();
+        return;
+    }
+
     const expense = {
-
-        amount: document.getElementById("amount").value,
-
-        description: document.getElementById("description").value,
-
-        
-
+        amount: numericAmount,
+        description
     };
 
     try{

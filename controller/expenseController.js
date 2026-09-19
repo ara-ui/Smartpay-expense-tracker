@@ -17,6 +17,13 @@ const addExpense = async (req, res) => {
         const { amount, description } = req.body;
         const numericAmount = Number(amount);
 
+        if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Amount must be a valid number greater than 0"
+            });
+        }
+
         if (!description || typeof description !== "string" || !description.trim()) {
             return res.status(400).json({
                 success: false,
@@ -131,6 +138,7 @@ const getExpenses=async(req,res)=>{
         const expenses = await Expense.find({
             userId: req.user._id
         })
+        .sort({ createdAt: -1 })
         .skip(offset)
         .limit(ITEMS_PER_PAGE);
 
