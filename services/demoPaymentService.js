@@ -22,16 +22,34 @@ const ensurePaymentId = async (user, session) => {
     const base = makePaymentId(user.name);
     let paymentId = base;
     let suffix = 1;
-    while (true) {
+
+    // Bounded retry: if a concurrent signup/save claims the same
+    // candidate paymentId first, the unique index rejects our save
+    // with E11000. Rather than let that bubble up as a request
+    // failure, move to the next suffix and try again.
+    for (let attempt = 0; attempt < 20; attempt++) {
         const query = User.exists({ paymentId, _id: { $ne: user._id } });
         if (session) query.session(session);
-        if (!(await query)) break;
-        paymentId = `${base.replace("@smartpay", "")}${suffix}@smartpay`;
-        suffix += 1;
+        if (await query) {
+            paymentId = `${base.replace("@smartpay", "")}${suffix}@smartpay`;
+            suffix += 1;
+            continue;
+        }
+
+        user.paymentId = paymentId;
+        try {
+            await user.save({ session });
+            return paymentId;
+        } catch (err) {
+            if (err.code !== 11000) throw err;
+            paymentId = `${base.replace("@smartpay", "")}${suffix}@smartpay`;
+            suffix += 1;
+        }
     }
-    user.paymentId = paymentId;
-    await user.save({ session });
-    return paymentId;
+
+    throw Object.assign(new Error("Unable to assign a unique SmartPay Payment ID"), {
+        code: "PAYMENT_ID_ASSIGNMENT_FAILED"
+    });
 };
 
 const requireEnabled = () => {

@@ -21,7 +21,7 @@ async function addUser(e) {
     userDetails.name = userDetails.name.trim();
     userDetails.email = userDetails.email.trim().toLowerCase();
 
-    const emailPattern = /^\\S+@\\S+\\.\\S+$/;
+    const emailPattern = /^\S+@\S+\.\S+$/;
 
     if (!emailPattern.test(userDetails.email)) {
         if (signupMessage) {
@@ -44,6 +44,13 @@ async function addUser(e) {
         if (signupMessage) {
             signupMessage.textContent = response.data.message || "Account created successfully.";
             signupMessage.className = "auth-message is-success";
+        }
+
+        if (response.data.token) {
+            localStorage.setItem("token", response.data.token);
+            if (signupSubmitBtn) signupSubmitBtn.textContent = "Redirecting...";
+            window.location.href = "expense.html";
+            return;
         }
 
         form.reset();

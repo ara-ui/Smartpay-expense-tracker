@@ -1,7 +1,6 @@
 const User = require('../model/User');
 const Expense = require("../model/Expense");
 const Order = require("../model/Order");
-const S3Service = require("../services/S3Service");
 const bcrypt = require("bcrypt");
 const { generateAccessToken } = require("../utils/jwt");
 const { getPeriodBounds } = require("../services/budgetService");
@@ -23,7 +22,7 @@ const createUser = async (req, res) => {
         }
 
         const normalizedEmail = String(email).trim().toLowerCase();
-        const emailPattern = /^\\S+@\\S+\\.\\S+$/;
+        const emailPattern = /^\S+@\S+\.\S+$/;
 
         if (!emailPattern.test(normalizedEmail)) {
             return res.status(400).json({
@@ -61,7 +60,18 @@ const createUser = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: "User created successfully",
-            user
+            token: generateAccessToken(
+                user._id,
+                user.name,
+                user.email,
+                user.isPremiumUser
+            ),
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isPremiumUser: user.isPremiumUser
+            }
         });
 
     }
@@ -91,7 +101,7 @@ const loginUser = async (req, res) => {
             });
         }
         const normalizedEmail = String(email).trim().toLowerCase();
-        const emailPattern = /^\\S+@\\S+\\.\\S+$/;
+        const emailPattern = /^\S+@\S+\.\S+$/;
 
         if (!emailPattern.test(normalizedEmail)) {
             return res.status(400).json({
@@ -304,16 +314,13 @@ const downloadExpenses = async (req, res) => {
             userId: req.user._id
         });
 
-        const data = JSON.stringify(expenses);
+        const data = JSON.stringify(expenses, null, 2);
+        const filename = `expenses-${req.user._id}-${Date.now()}.json`;
 
-        const filename = `Expenses/User-${req.user._id}/${Date.now()}.txt`;
-
-        const fileURL = await S3Service.uploadToS3(data, filename);
-
-        return res.status(200).json({
-            success: true,
-            fileURL
-        });
+        // Served directly from the app - no external storage involved.
+        res.setHeader("Content-Type", "application/json");
+        res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+        return res.status(200).send(data);
 
     } catch (err) {
 

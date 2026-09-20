@@ -26,7 +26,7 @@ const applyPurposeEffect = async ({ order, session }) => {
         throw new Error(`Unsupported payment purpose: ${order.purpose}`);
     }
 
-    await handler({ order, session });
+    return await handler({ order, session });
 };
 
 module.exports = { applyPurposeEffect };

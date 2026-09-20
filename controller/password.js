@@ -3,9 +3,14 @@ const mailService = require("../services/mailService");
 const ForgotPasswordRequest = require("../model/ForgotPasswordRequest");
 const ChangePasswordOTP = require("../model/ChangePasswordOTP");
 
-const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+
+// Reset tokens are never stored in plaintext: the raw, high-entropy token
+// only ever exists in the emailed link. The DB keeps a SHA-256 digest of
+// it, so a database leak alone cannot be used to reset anyone's password.
+const hashResetToken = (rawToken) =>
+  crypto.createHash("sha256").update(String(rawToken)).digest("hex");
 
 // FORGOT PASSWORD
 exports.forgotPassword = async (req, res) => {
@@ -18,28 +23,39 @@ exports.forgotPassword = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    // Always the same response, whether or not this email is registered,
+    // so the endpoint can't be used to enumerate accounts.
+    const genericResponse = {
+      message: "Reset Password Link sent successfully"
+    };
+
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found"
-      });
+      return res.status(200).json(genericResponse);
     }
 
-    const id = uuidv4();
-
+    const rawToken = crypto.randomBytes(32).toString("hex");
 
     await ForgotPasswordRequest.create({
-      resetToken: id,
+      resetToken: hashResetToken(rawToken),
       isActive: true,
       userId: user._id
     });
 
-    await mailService.sendMail(email, id);
+    try {
+      // Only the raw token goes out over email; it is never logged or
+      // stored anywhere in this form.
+      await mailService.sendMail(normalizedEmail, rawToken);
+    } catch (mailErr) {
+      // A mail-provider outage must not change the response shape -
+      // that would itself leak whether the account exists.
+      console.error("Forgot password: failed to send reset email:", mailErr);
+    }
 
-    return res.status(200).json({
-      message: "Reset Password Link sent successfully"
-    });
+    return res.status(200).json(genericResponse);
   } catch (err) {
     console.error("Forgot password error:", err);
 
@@ -56,7 +72,7 @@ exports.resetPassword = async (req, res) => {
     const id = req.params.id;
 
     const request = await ForgotPasswordRequest.findOne({
-      resetToken: id,
+      resetToken: hashResetToken(id),
       isActive: true
     });
 
@@ -104,7 +120,7 @@ exports.updatePassword = async (req, res) => {
 
 
     const request = await ForgotPasswordRequest.findOne({
-      resetToken: id,
+      resetToken: hashResetToken(id),
       isActive: true
     });
 

@@ -126,8 +126,8 @@ const getExpenses=async(req,res)=>{
     try{
         //pagination
 
-        const page=Number(req.query.page)|| 1;
-        const ITEMS_PER_PAGE = Number(req.query.limit) || 10;
+        const page = Math.max(Number(req.query.page) || 1, 1);
+        const ITEMS_PER_PAGE = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
         const offset=(page -1) *ITEMS_PER_PAGE;
 
         const totalExpenses=await Expense.countDocuments({
