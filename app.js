@@ -1,28 +1,25 @@
 require("dotenv").config();
 
-const PORT = process.env.PORT;
-const express=require('express');
-const app=express();
-const { connectDB } = require('./db');
-const cors=require('cors');
-const helmet = require('helmet');
-const path=require('path');
-
-require('./model');
-
-const morgan = require("morgan");
+const express = require("express");
+const path = require("path");
 const fs = require("fs");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
 
+const requiredEnv = ["MONGODB_URI", "JWT_SECRET"];
+const missingEnv = requiredEnv.filter((key) => !process.env[key]?.trim());
+const PORT = Number(process.env.PORT) || 3000;
 
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, "access.log"),
-  { flags: "a" }
-);
+const app = express();
+app.set("trust proxy", 1);
 
-app.use(morgan("combined", { stream: accessLogStream }));
+const { connectDB } = require("./db");
 
-const userRoutes=require('./routes/userRoutes');
-const expenseRoutes=require('./routes/expenseRoutes');
+require("./model");
+
+const userRoutes = require("./routes/userRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
 const purchaseRoutes = require("./routes/purchaseRoutes");
 const { cashfreeWebhook } = require("./controller/purchaseController");
 const premiumRoutes = require("./routes/premiumRoutes");
@@ -34,6 +31,30 @@ const demoPaymentRoutes = require("./routes/demoPaymentRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, "access.log"),
+    { flags: "a" }
+);
+
+const redactSensitivePath = (url) =>
+    String(url || "").replace(
+        /(\/password\/resetpassword\/)[^/?\s]+/gi,
+        "$1[redacted]"
+    );
+
+app.use(
+    morgan((tokens, req, res) => [
+        tokens["remote-addr"](req, res),
+        tokens.method(req, res),
+        redactSensitivePath(tokens.url(req, res)),
+        tokens.status(req, res),
+        tokens.res(req, res, "content-length"),
+        tokens["response-time"](req, res),
+        "ms"
+    ].join(" "), {
+        stream: accessLogStream
+    })
+);
 
 app.use(helmet({
     contentSecurityPolicy: false,
@@ -46,26 +67,25 @@ app.use(cors({
     origin: allowedOrigin
 }));
 
+// Cashfree webhook must receive the raw body for signature verification.
 app.post(
     "/purchase/webhook/cashfree",
     express.raw({ type: "application/json", limit: "1mb" }),
     cashfreeWebhook
 );
 
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.json());
-app.use(express.static('public'));
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "login.html"));
 });
-app.use(express.urlencoded({extended:true}));
 
-
-//routes
-
-app.use('/users',userRoutes);
-app.use('/expense',expenseRoutes);
-app.use('/purchase', purchaseRoutes);
+// Routes
+app.use("/users", userRoutes);
+app.use("/expense", expenseRoutes);
+app.use("/purchase", purchaseRoutes);
 app.use("/premium", premiumRoutes);
 app.use("/password", passwordRoutes);
 app.use("/expense", reportsRoutes);
@@ -74,20 +94,31 @@ app.use("/payments", paymentRoutes);
 app.use("/payments/demo", demoPaymentRoutes);
 app.use("/notifications", notificationRoutes);
 
-// central error handler - must be registered after all routes
+// Central error handler must be registered after all routes.
 app.use(errorHandler);
 
-// connect to MongoDB and start server
+const startServer = async () => {
+    if (missingEnv.length) {
+        console.error(`Missing required environment variable(s): ${missingEnv.join(", ")}`);
+        process.exitCode = 1;
+        return;
+    }
 
-connectDB().then(() => {
-    console.log("Database connected");
+    try {
+        await connectDB();
+        console.log("Database connected");
 
-    app.listen(PORT, () => {
-        console.log("Server is running.");
-    });
-})
-.catch((err)=>{
-    console.log(err);
-});
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}.`);
+        });
+    } catch (err) {
+        console.error("Server startup failed:", err.message);
+        process.exitCode = 1;
+    }
+};
 
+if (require.main === module) {
+    startServer();
+}
 
+module.exports = { app, startServer };

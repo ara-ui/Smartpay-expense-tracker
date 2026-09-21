@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema(
 
         password: {
             type: String,
-            required: true
+            required: true,
+            select: false
         },
 
         totalExpense: {
@@ -29,11 +30,6 @@ const userSchema = new mongoose.Schema(
         isPremiumUser: {
             type: Boolean,
             default: false
-        },
-
-        monthlyIncome: {
-            type: Number,
-            default: 0
         },
 
         // Deprecated legacy budget field. New budgets are stored in BudgetRule.

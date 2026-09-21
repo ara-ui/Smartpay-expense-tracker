@@ -3,15 +3,15 @@ const { GoogleGenAI } = require('@google/genai');
 const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
 const CATEGORIES = new Set(["Food","Travel","Shopping","Entertainment","Bills","Health","Education","Salary","Investment","Other"]);
 const rules = [
-  [/(uber|ola|cab|taxi|metro|bus|train|flight|airline|auto|rickshaw|rapido|fuel|petrol|diesel)/i, "Travel"],
-  [/(food|tea|coffee|chai|lunch|dinner|breakfast|snack|pizza|burger|restaurant|swiggy|zomato|dominos|kfc|mcdonald)/i, "Food"],
-  [/(amazon|myntra|flipkart|shopping|clothes|shirt|shoes|purchase)/i, "Shopping"],
-  [/(netflix|movie|cinema|spotify|music|game|gaming|entertainment)/i, "Entertainment"],
-  [/(electricity|water bill|broadband|rent|internet|wifi|recharge|phone bill|utility)/i, "Bills"],
-  [/(doctor|hospital|medicine|medical|pharmacy|health)/i, "Health"],
-  [/(course|book|tuition|college|school|education)/i, "Education"],
-  [/(salary|paycheck|income)/i, "Salary"],
-  [/(investment|mutual fund|stocks|sip)/i, "Investment"]
+  [/\b(uber|ola|cab|taxi|metro|bus|train|flight|airline|auto|rickshaw|rapido|fuel|petrol|diesel)\b/i, "Travel"],
+  [/\b(food|tea|coffee|chai|lunch|dinner|breakfast|snack|pizza|burger|restaurant|swiggy|zomato|dominos|kfc|mcdonald)\b/i, "Food"],
+  [/\b(amazon|myntra|flipkart|shopping|clothes|shirt|shoes|purchase)\b/i, "Shopping"],
+  [/\b(netflix|movie|cinema|spotify|music|game|gaming|entertainment)\b/i, "Entertainment"],
+  [/\b(electricity|water bill|broadband|rent|internet|wifi|recharge|phone bill|utility)\b/i, "Bills"],
+  [/\b(doctor|hospital|medicine|medical|pharmacy|health)\b/i, "Health"],
+  [/\b(course|book|tuition|college|school|education)\b/i, "Education"],
+  [/\b(salary|paycheck|income)\b/i, "Salary"],
+  [/\b(investment|mutual fund|stocks|sip)\b/i, "Investment"]
 ];
 
 function getLocalCategory(description) {

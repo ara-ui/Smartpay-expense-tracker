@@ -4,12 +4,26 @@ const getForwardedValue = (value) =>
         : null;
 
 const getPublicBaseUrl = (req) => {
+    // In production, callbacks must use the server-controlled public URL.
+    // Request headers can be spoofed and should only be a development fallback.
+    const configuredUrl = (process.env.APP_URL || "").trim().replace(/\/+$/, "");
+    if (configuredUrl) {
+        try {
+            const parsed = new URL(configuredUrl);
+            if (["http:", "https:"].includes(parsed.protocol)) {
+                return parsed.origin;
+            }
+        } catch {
+            return null;
+        }
+    }
+
     const origin = getForwardedValue(req.get("origin"));
     if (origin) {
         try {
             const parsed = new URL(origin);
             if (["http:", "https:"].includes(parsed.protocol)) {
-                return origin.replace(/\/+$/, "");
+                return parsed.origin;
             }
         } catch {
             // Fall through to proxy/server-derived URL.
@@ -25,20 +39,7 @@ const getPublicBaseUrl = (req) => {
         return `${protocol}://${host}`.replace(/\/+$/, "");
     }
 
-    const referer = getForwardedValue(req.get("referer"));
-    if (referer) {
-        try {
-            const parsed = new URL(referer);
-            if (["http:", "https:"].includes(parsed.protocol)) {
-                return parsed.origin;
-            }
-        } catch {
-            // Fall through to APP_URL.
-        }
-    }
-
-    const appUrl = (process.env.APP_URL || "").replace(/\/+$/, "");
-    return appUrl || null;
+    return null;
 };
 
 const getCashfreeReturnUrl = (req) => {

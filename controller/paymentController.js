@@ -17,7 +17,10 @@ exports.createExpensePayment = async (req, res) => {
         return res.status(201).json({
             success: true,
             payment_session_id: result.paymentSessionId,
-            order_id: result.orderId
+            order_id: result.orderId,
+            cashfree_mode: String(process.env.CASHFREE_ENVIRONMENT || "sandbox").trim().toLowerCase() === "production"
+                ? "production"
+                : "sandbox"
         });
     } catch (err) {
         console.error("Expense payment order creation failed:", err);
@@ -29,7 +32,9 @@ exports.createExpensePayment = async (req, res) => {
         return res.status(status).json({
             success: false,
             code: err.code || "PAYMENT_ORDER_FAILED",
-            message: err.message || "Unable to create payment order"
+            message: status === 502
+                ? "Unable to create payment order"
+                : (err.message || "Unable to create payment order")
         });
     }
 };

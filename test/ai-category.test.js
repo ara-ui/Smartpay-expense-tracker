@@ -15,6 +15,8 @@ test("getLocalCategory does not recurse infinitely and classifies known keywords
     assert.equal(getLocalCategory("mobile recharge"), "Bills");
     assert.equal(getLocalCategory(""), null);
     assert.equal(getLocalCategory("something totally unrelated xyz"), null);
+    assert.equal(getLocalCategory("chocolate bar"), null);
+    assert.equal(getLocalCategory("parents gift"), null);
 });
 
 test("getCategory resolves obvious descriptions locally without needing Gemini", async () => {

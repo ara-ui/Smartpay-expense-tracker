@@ -13,27 +13,6 @@ const generateAccessToken = (id, name, email, isPremiumUser) => {
     );
 };
 
-const generateBudgetReauthToken = (userId) => {
-    return jwt.sign(
-        {
-            userId: String(userId),
-            purpose: "BUDGET_EDIT"
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "15m" }
-    );
-};
-
-const verifyBudgetReauthToken = (token, userId) => {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return (
-        decoded.purpose === "BUDGET_EDIT" &&
-        String(decoded.userId) === String(userId)
-    );
-};
-
 module.exports = {
-    generateAccessToken,
-    generateBudgetReauthToken,
-    verifyBudgetReauthToken
+    generateAccessToken
 };

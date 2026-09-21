@@ -17,10 +17,13 @@ const sendError = (res, err) => {
         INSUFFICIENT_DEMO_BALANCE: 409,
         BUDGET_EXCEEDED: 409
     };
-    return res.status(statusMap[err.code] || 500).json({
+    const status = statusMap[err.code] || 500;
+    return res.status(status).json({
         success: false,
         code: err.code || "DEMO_PAYMENT_FAILED",
-        message: err.message || "Unable to process demo transfer",
+        message: status === 500
+            ? "Unable to process demo transfer"
+            : (err.message || "Unable to process demo transfer"),
         ...(err.details ? { details: err.details } : {})
     });
 };

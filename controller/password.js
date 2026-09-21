@@ -6,9 +6,6 @@ const ChangePasswordOTP = require("../model/ChangePasswordOTP");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
-// Reset tokens are never stored in plaintext: the raw, high-entropy token
-// only ever exists in the emailed link. The DB keeps a SHA-256 digest of
-// it, so a database leak alone cannot be used to reset anyone's password.
 const hashResetToken = (rawToken) =>
   crypto.createHash("sha256").update(String(rawToken)).digest("hex");
 
@@ -17,16 +14,15 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
+    if (typeof email !== "string" || !email.trim()) {
       return res.status(400).json({
         message: "Email is required"
       });
     }
 
-    const normalizedEmail = String(email).trim().toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase();
 
-    // Always the same response, whether or not this email is registered,
-    // so the endpoint can't be used to enumerate accounts.
+    // Always return the same response for known/unknown accounts.
     const genericResponse = {
       message: "Reset Password Link sent successfully"
     };
@@ -37,27 +33,36 @@ exports.forgotPassword = async (req, res) => {
       return res.status(200).json(genericResponse);
     }
 
+    // Only one active reset link is valid at a time.
+    await ForgotPasswordRequest.updateMany(
+      { userId: user._id, isActive: true },
+      { $set: { isActive: false } }
+    );
+
     const rawToken = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
     await ForgotPasswordRequest.create({
       resetToken: hashResetToken(rawToken),
       isActive: true,
+      expiresAt,
       userId: user._id
     });
 
     try {
-      // Only the raw token goes out over email; it is never logged or
-      // stored anywhere in this form.
       await mailService.sendMail(normalizedEmail, rawToken);
     } catch (mailErr) {
-      // A mail-provider outage must not change the response shape -
-      // that would itself leak whether the account exists.
-      console.error("Forgot password: failed to send reset email:", mailErr);
+      // Keep the generic response to avoid account enumeration. The token
+      // remains short-lived and can simply expire if delivery fails.
+      console.error(
+        "Forgot password email delivery failed:",
+        mailErr.message
+      );
     }
 
     return res.status(200).json(genericResponse);
   } catch (err) {
-    console.error("Forgot password error:", err);
+    console.error("Forgot password error:", err.message);
 
     return res.status(500).json({
       message: "Something went wrong"
@@ -69,37 +74,23 @@ exports.forgotPassword = async (req, res) => {
 // RESET PASSWORD PAGE
 exports.resetPassword = async (req, res) => {
   try {
-    const id = req.params.id;
+    const tokenHash = hashResetToken(req.params.id);
 
     const request = await ForgotPasswordRequest.findOne({
-      resetToken: hashResetToken(id),
-      isActive: true
-    });
+      resetToken: tokenHash,
+      isActive: true,
+      expiresAt: { $gt: new Date() }
+    }).lean();
 
     if (!request) {
       return res.status(400).send("Invalid or Expired Reset Link");
     }
 
-    const fifteenMinutes = 15 * 60 * 1000;
-
-    if (
-      Date.now() - new Date(request.createdAt).getTime() >
-      fifteenMinutes
-    ) {
-      request.isActive = false;
-      await request.save();
-
-      return res.status(400).send("Reset link has expired");
-    }
-
-    res.sendFile(
-      require("path").join(
-        __dirname,
-        "../public/resetpassword.html"
-      )
+    return res.sendFile(
+      require("path").join(__dirname, "../public/resetpassword.html")
     );
   } catch (err) {
-    console.error("Reset password error:", err);
+    console.error("Reset password error:", err.message);
 
     return res.status(500).send("Something went wrong");
   }
@@ -112,17 +103,25 @@ exports.updatePassword = async (req, res) => {
     const id = req.params.id;
     const { password } = req.body;
 
-    if (!password || password.length < 5) {
+    if (typeof password !== "string" || password.length < 5) {
       return res.status(400).json({
         message: "Password must be at least 5 characters"
       });
     }
 
-
-    const request = await ForgotPasswordRequest.findOne({
-      resetToken: hashResetToken(id),
-      isActive: true
-    });
+    // Claim the token atomically before changing the password. This prevents
+    // two concurrent requests from using the same reset link successfully.
+    const request = await ForgotPasswordRequest.findOneAndUpdate(
+      {
+        resetToken: hashResetToken(id),
+        isActive: true,
+        expiresAt: { $gt: new Date() }
+      },
+      {
+        $set: { isActive: false }
+      },
+      { new: true }
+    );
 
     if (!request) {
       return res.status(400).json({
@@ -130,23 +129,6 @@ exports.updatePassword = async (req, res) => {
       });
     }
 
-    const fifteenMinutes = 15 * 60 * 1000;
-
-    if (
-      Date.now() - new Date(request.createdAt).getTime() >
-      fifteenMinutes
-    ) {
-      request.isActive = false;
-      await request.save();
-
-      return res.status(400).json({
-        message: "Reset link has expired"
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-   
     const user = await User.findById(request.userId);
 
     if (!user) {
@@ -155,17 +137,26 @@ exports.updatePassword = async (req, res) => {
       });
     }
 
-    user.password = hashedPassword;
+    user.password = await bcrypt.hash(password, 10);
     await user.save();
 
-    request.isActive = false;
-    await request.save();
+    // A successful password reset invalidates any other outstanding reset
+    // requests that may have been created before this one.
+    await ForgotPasswordRequest.updateMany(
+      {
+        userId: user._id,
+        isActive: true
+      },
+      {
+        $set: { isActive: false }
+      }
+    );
 
     return res.status(200).json({
       message: "Password Updated Successfully"
     });
   } catch (err) {
-    console.error("Update password error:", err);
+    console.error("Update password error:", err.message);
 
     return res.status(500).json({
       message: "Something went wrong"
@@ -179,7 +170,12 @@ exports.requestChangePassword = async (req, res) => {
   try {
     const { newPassword, confirmPassword } = req.body;
 
-    if (!newPassword || !confirmPassword) {
+    if (
+      typeof newPassword !== "string" ||
+      typeof confirmPassword !== "string" ||
+      !newPassword ||
+      !confirmPassword
+    ) {
       return res.status(400).json({
         message: "All fields are required"
       });
@@ -255,7 +251,7 @@ exports.requestChangePassword = async (req, res) => {
   } catch (err) {
     console.error(
       "Request change password error:",
-      err
+      err.message
     );
 
     return res.status(500).json({
@@ -270,7 +266,7 @@ exports.verifyChangePassword = async (req, res) => {
   try {
     const { otp } = req.body;
 
-    if (!otp) {
+    if (typeof otp !== "string" || !/^\d{6}$/.test(otp)) {
       return res.status(400).json({
         message: "OTP is required"
       });
@@ -310,7 +306,7 @@ exports.verifyChangePassword = async (req, res) => {
     }
 
     const validOTP = await bcrypt.compare(
-      otp.toString(),
+      otp,
       request.otpHash
     );
 
@@ -343,57 +339,11 @@ exports.verifyChangePassword = async (req, res) => {
   } catch (err) {
     console.error(
       "Verify change password error:",
-      err
+      err.message
     );
 
     return res.status(500).json({
       message: "Something went wrong"
-    });
-  }
-};
-
-// VERIFY PASSWORD FOR SENSITIVE BUDGET CHANGES
-exports.verifyBudgetAccess = async (req, res) => {
-  try {
-    const { password } = req.body;
-
-    if (!password || typeof password !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Password is required"
-      });
-    }
-
-    const user = await User.findById(req.user._id).select("password");
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    const validPassword = await bcrypt.compare(password, user.password);
-
-    if (!validPassword) {
-      return res.status(401).json({
-        success: false,
-        message: "Incorrect password"
-      });
-    }
-
-    const { generateBudgetReauthToken } = require("../utils/jwt");
-
-    return res.status(200).json({
-      success: true,
-      message: "Budget editing access verified",
-      reauthToken: generateBudgetReauthToken(user._id)
-    });
-  } catch (err) {
-    console.error("Budget access verification error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Unable to verify password"
     });
   }
 };

@@ -104,10 +104,10 @@ async function updatePassword(e) {
 
 
     const password =
-        passwordInput.value.trim();
+        passwordInput.value;
 
     const confirmPassword =
-        confirmPasswordInput.value.trim();
+        confirmPasswordInput.value;
 
 
     /* Minimum length */

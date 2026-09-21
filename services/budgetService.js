@@ -107,10 +107,20 @@ async function getOrCreateBudgetRule(userId, session) {
     if (session) query = query.session(session);
     let budgetRules = await query;
 
-    // One-time compatibility migration for the old User.monthlyBudget field.
-    // The new BudgetRule document is the single source of truth. We also
-    // handle an empty BudgetRule that may have been created by Phase 2/3
-    // before the legacy value was migrated.
+    // Existing configured BudgetRule documents are the source of truth.
+    // Only inspect the legacy User.monthlyBudget field when migration is
+    // actually needed, avoiding an extra User query on every budget call.
+    const ruleIsEmpty =
+        budgetRules &&
+        budgetRules.dailyLimitPaise == null &&
+        budgetRules.weeklyLimitPaise == null &&
+        budgetRules.monthlyLimitPaise == null &&
+        (budgetRules.categoryLimits?.length || 0) === 0;
+
+    if (budgetRules && !ruleIsEmpty) {
+        return budgetRules;
+    }
+
     let userQuery = User.findById(userId).select("monthlyBudget");
     if (session) userQuery = userQuery.session(session);
     const user = await userQuery;
@@ -122,17 +132,11 @@ async function getOrCreateBudgetRule(userId, session) {
         ? Math.round(legacyMonthlyBudget * 100)
         : null;
 
-    const ruleIsEmpty =
-        budgetRules &&
-        budgetRules.dailyLimitPaise == null &&
-        budgetRules.weeklyLimitPaise == null &&
-        budgetRules.monthlyLimitPaise == null &&
-        (budgetRules.categoryLimits?.length || 0) === 0;
-
     if (budgetRules) {
         if (ruleIsEmpty && hasLegacyBudget) {
             budgetRules.monthlyLimitPaise = monthlyLimitPaise;
             await budgetRules.save({ session });
+
             if (user) {
                 user.monthlyBudget = 0;
                 await user.save({ session });

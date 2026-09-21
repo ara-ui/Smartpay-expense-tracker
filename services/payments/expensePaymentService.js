@@ -67,8 +67,11 @@ const createExpenseFromPayment = async ({ order, session }) => {
 
     const expense = created[0];
 
-    user.totalExpense = Number(user.totalExpense) + amount;
-    await user.save({ session });
+    await User.updateOne(
+        { _id: order.userId },
+        { $inc: { totalExpense: amount } },
+        { session }
+    );
 
     await Transaction.updateOne(
         { provider: order.provider, orderId: order.orderId },

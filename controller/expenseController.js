@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Expense=require('../model/Expense');
+const User = require('../model/User');
 const aiService = require("../services/aiService");
 const {
     BudgetExceededError,
@@ -56,11 +57,7 @@ const addExpense = async (req, res) => {
         let budgetChecks = [];
         try {
             await session.withTransaction(async () => {
-                // Budget enforcement and the expense + totalExpense updates
-                // happen in one MongoDB transaction. BudgetUsage writes are
-                // therefore rolled back automatically if expense creation or
-                // the user update fails.
-                const budgetResult = await enforceExpenseBudget({
+                    const budgetResult = await enforceExpenseBudget({
                     userId: req.user._id,
                     amount: numericAmount,
                     category,
@@ -80,10 +77,11 @@ const addExpense = async (req, res) => {
 
                 expense = created[0];
 
-                req.user.totalExpense =
-                    Number(req.user.totalExpense) + numericAmount;
-
-                await req.user.save({ session });
+                await User.updateOne(
+                    { _id: req.user._id },
+                    { $inc: { totalExpense: numericAmount } },
+                    { session }
+                );
             });
         } catch (err) {
             if (err instanceof BudgetExceededError) {
@@ -97,9 +95,7 @@ const addExpense = async (req, res) => {
             throw err;
         }
 
-        // Non-critical side effect - fires after the transaction has
-        // committed, so a notification hiccup can never roll back a
-        // successfully recorded expense.
+
         notifyBudgetThresholds(req.user._id, budgetChecks).catch((err) => {
             console.log("Budget notification failed:", err.message);
         });
@@ -130,18 +126,14 @@ const getExpenses=async(req,res)=>{
         const ITEMS_PER_PAGE = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
         const offset=(page -1) *ITEMS_PER_PAGE;
 
-        const totalExpenses=await Expense.countDocuments({
-            userId: req.user._id
-        });
-
-
-        const expenses = await Expense.find({
-            userId: req.user._id
-        })
-        .sort({ createdAt: -1 })
-        .skip(offset)
-        .limit(ITEMS_PER_PAGE);
-
+        const [totalExpenses, expenses] = await Promise.all([
+            Expense.countDocuments({ userId: req.user._id }),
+            Expense.find({ userId: req.user._id })
+                .sort({ createdAt: -1 })
+                .skip(offset)
+                .limit(ITEMS_PER_PAGE)
+                .lean()
+        ]);
 
         res.status(200).json({
             success:true,
@@ -192,10 +184,11 @@ const deleteExpense = async (req, res) => {
                 session
             });
 
-            req.user.totalExpense =
-                Number(req.user.totalExpense) - Number(expense.amount);
-
-            await req.user.save({ session });
+            await User.updateOne(
+                { _id: req.user._id },
+                { $inc: { totalExpense: -Number(expense.amount) } },
+                { session }
+            );
         });
 
         if (!expense) {

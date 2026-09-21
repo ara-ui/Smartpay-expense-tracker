@@ -33,7 +33,7 @@ let currentDate = new Date();
 let currentReportData = {
     expenses: [],
     totalExpense: 0,
-    income: 0
+    savings: null
 };
 
 let lastNonCustomView = "daily";
@@ -58,6 +58,15 @@ function formatDate(date) {
 
 }
 
+
+function startOfWeekMonday(date) {
+    const start = new Date(date);
+    const day = start.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    start.setDate(start.getDate() + mondayOffset);
+    start.setHours(0, 0, 0, 0);
+    return start;
+}
 
 function toggleFilterControls() {
 
@@ -110,36 +119,6 @@ tabs.forEach(tab => {
 
 
 
-// GET MONTHLY INCOME
-
-
-async function getIncome() {
-
-    try {
-
-        const response = await axios.get(
-            `${BASE_URL}/users/income`,
-            {
-                headers: {
-                    Authorization: token
-                }
-            }
-        );
-
-        return response.data.monthlyIncome || 0;
-
-    }
-    catch (err) {
-
-        console.log(err);
-
-        return 0;
-
-    }
-
-}
-
-
 async function updateDisplay() {
 
     if (currentView === "daily") {
@@ -154,9 +133,7 @@ async function updateDisplay() {
 
     else if (currentView === "weekly") {
 
-        const start = new Date(currentDate);
-
-        start.setDate(currentDate.getDate() - currentDate.getDay());
+        const start = startOfWeekMonday(currentDate);
 
         const end = new Date(start);
 
@@ -345,9 +322,7 @@ async function getReport() {
 
         else if (currentView === "weekly") {
 
-            const start = new Date(currentDate);
-
-            start.setDate(currentDate.getDate() - currentDate.getDay());
+            const start = startOfWeekMonday(currentDate);
 
             date = formatDate(start);
 
@@ -384,28 +359,24 @@ async function getReport() {
             }
         );
 
-        const income = await getIncome();
-
-        document.getElementById("income").textContent =
-            `₹${income}`;
-
         tbody.innerHTML = "";
 
         const expenses = response.data.expenses;
         const totalExpense = response.data.totalExpense;
+        const savings = response.data.savings;
 
 
         currentReportData = {
         expenses: expenses,
         totalExpense: totalExpense,
-        income: income
+        savings: savings
         };
 
         document.getElementById("expense").textContent =
             `₹${totalExpense}`;
 
         document.getElementById("saving").textContent =
-            `₹${income - totalExpense}`;
+            savings === null || savings === undefined ? "—" : `₹${savings}`;
 
         
         updateStatistics(expenses, totalExpense);
@@ -438,9 +409,9 @@ async function getReport() {
                     })}
                 </td>
 
-                <td>${expense.description}</td>
+                <td>${escapeHtml(expense.description)}</td>
 
-                <td>${expense.category}</td>
+                <td>${escapeHtml(expense.category)}</td>
 
                 <td>₹${expense.amount}</td>
             `;
@@ -703,8 +674,7 @@ function getReportPeriodLabel() {
 
     if (currentView === "weekly") {
 
-        const start = new Date(currentDate);
-        start.setDate(currentDate.getDate() - currentDate.getDay());
+        const start = startOfWeekMonday(currentDate);
 
         const end = new Date(start);
         end.setDate(start.getDate() + 6);
@@ -745,8 +715,7 @@ function buildReportFilename(format) {
     }
 
     if (currentView === "weekly") {
-        const start = new Date(currentDate);
-        start.setDate(currentDate.getDate() - currentDate.getDay());
+        const start = startOfWeekMonday(currentDate);
         const end = new Date(start);
         end.setDate(start.getDate() + 6);
         const fmt = (d) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }).replace(/,/g, "").replace(/ /g, "-");
@@ -770,8 +739,7 @@ async function recordReportDownload(format) {
         if (!customRangeActive) {
             if (currentView === "daily") dateParam = formatDate(currentDate);
             else if (currentView === "weekly") {
-                const start = new Date(currentDate);
-                start.setDate(currentDate.getDate() - currentDate.getDay());
+                const start = startOfWeekMonday(currentDate);
                 dateParam = formatDate(start);
             } else if (currentView === "monthly") {
                 dateParam = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-01`;
@@ -801,6 +769,16 @@ async function recordReportDownload(format) {
 
 let isExporting = false;
 
+function csvCell(value) {
+    const text = String(value ?? "");
+    const safeText =
+        typeof value === "string" && /^[=+\-@]/.test(text)
+            ? `'${text}`
+            : text;
+
+    return `"${safeText.replace(/"/g, '""')}"`;
+}
+
 function exportCSV() {
 
     if (isExporting) return;
@@ -822,7 +800,7 @@ function exportCSV() {
     try {
 
     const totalExpense = currentReportData.totalExpense;
-    const income = currentReportData.income;
+    const savings = currentReportData.savings;
 
     const count = expenses.length;
 
@@ -856,8 +834,7 @@ function exportCSV() {
     rows.push(["Transactions", count]);
     rows.push(["Average Expense", average.toFixed(2)]);
     rows.push(["Highest Expense", highest]);
-    rows.push(["Income", income]);
-    rows.push(["Savings", income - totalExpense]);
+    rows.push(["Savings", savings === null || savings === undefined ? "N/A" : savings]);
     rows.push([]);
 
 
@@ -925,15 +902,7 @@ function exportCSV() {
 
   
     const csvContent = rows
-        .map(row =>
-            row.map(value => {
-
-                const text = String(value ?? "");
-
-                return `"${text.replace(/"/g, '""')}"`;
-
-            }).join(",")
-        )
+        .map(row => row.map(csvCell).join(","))
         .join("\n");
 
 
@@ -1001,7 +970,7 @@ function exportPDF() {
 
     const totalExpense = currentReportData.totalExpense;
 
-    const income = currentReportData.income;
+    const savings = currentReportData.savings;
 
     const count = expenses.length;
 
@@ -1086,12 +1055,8 @@ function exportPDF() {
                 `INR ${highest}`
             ],
             [
-                "Income",
-                `INR ${income}`
-            ],
-            [
                 "Savings",
-                `INR ${income - totalExpense}`
+                savings === null || savings === undefined ? "N/A" : `INR ${savings}`
             ]
         ],
 

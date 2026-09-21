@@ -30,7 +30,10 @@ exports.purchasePremium = async (req, res) => {
         return res.status(201).json({
             success: true,
             payment_session_id: result.paymentSessionId,
-            order_id: result.orderId
+            order_id: result.orderId,
+            cashfree_mode: String(process.env.CASHFREE_ENVIRONMENT || "sandbox").trim().toLowerCase() === "production"
+                ? "production"
+                : "sandbox"
         });
     } catch (err) {
         console.error("Payment order creation failed:", err);
@@ -48,7 +51,12 @@ exports.purchasePremium = async (req, res) => {
 exports.updateTransactionStatus = async (req, res) => {
     try {
         const { order_id: orderId } = req.body;
-        if (!orderId) return res.status(400).json({ success: false, message: "Order ID is required" });
+        if (typeof orderId !== "string" || !orderId.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Order ID is required"
+            });
+        }
 
         const result = await verifyAndApply({ orderId, userId: req.user._id });
 
@@ -83,8 +91,7 @@ exports.updateTransactionStatus = async (req, res) => {
 exports.cashfreeReturn = async (req, res) => {
     const orderId = typeof req.query.order_id === "string" ? req.query.order_id.trim() : "";
     const query = orderId ? `?order_id=${encodeURIComponent(orderId)}` : "";
-    // Relative redirect preserves whichever origin the customer used
-    // (localhost or the active ngrok URL). No sessionStorage is required.
+
     return res.redirect(303, `/payment-status.html${query}`);
 };
 

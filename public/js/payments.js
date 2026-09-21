@@ -46,7 +46,7 @@ const writeWalletCache = (wallet) => {
 };
 
 let currentPaymentId = "";
-let currentEmail = "";
+let currentEmail = String(getCurrentUser()?.email || "").toLowerCase();
 let walletData = null;
 let activityData = [];
 

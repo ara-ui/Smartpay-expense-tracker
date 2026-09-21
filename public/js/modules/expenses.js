@@ -145,6 +145,15 @@ function renderExpenses(data){
 }
 
 
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // Show Expense in ui
 function showExpense(expense, index, totalExpenses){
 
@@ -165,9 +174,9 @@ function showExpense(expense, index, totalExpenses){
             })}
         </td>
 
-        <td>${expense.description}</td>
+        <td>${escapeHtml(expense.description)}</td>
 
-        <td>${expense.category}</td>
+        <td>${escapeHtml(expense.category)}</td>
 
         <td>₹${expense.amount}</td>
 
@@ -225,56 +234,5 @@ async function deleteExpense(id, button){
         console.log(err);
 
     }
-
-}
-
-
-
-async function downloadExpenses() {
-
-    try {
-
-        const token = localStorage.getItem("token");
-
-        const response = await axios.get(
-            `${BASE_URL}/users/download`,
-            {
-                headers: {
-                    Authorization: token
-                }
-            }
-        );
-
-        if (response.data.success) {
-
-        const linkDiv = document.getElementById("downloadLink");
-
-        linkDiv.style.display="block";
-
-        linkDiv.innerHTML = `
-        <div class="download-success">
-
-            <span>✅ Report Generated Successfully</span>
-
-            <a href="${response.data.fileURL}" target="_blank">
-                Download Report
-            </a>
-
-        </div>
-        `;
-        }
-
-    }
-
-    catch (err) {
-
-    console.log(err);
-
-    if (err.response) {
-        alert(err.response.data.message);
-    } else {
-        alert(err.message);
-    }
-}
 
 }

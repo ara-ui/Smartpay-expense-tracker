@@ -11,7 +11,10 @@ const forgotPasswordRequestSchema = new mongoose.Schema(
             type: Boolean,
             default: true
         },
-
+        expiresAt: {
+            type: Date,
+            required: true
+        },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -21,6 +24,11 @@ const forgotPasswordRequestSchema = new mongoose.Schema(
     {
         timestamps: true
     }
+);
+
+forgotPasswordRequestSchema.index(
+    { expiresAt: 1 },
+    { expireAfterSeconds: 0 }
 );
 
 module.exports = mongoose.model(

@@ -35,7 +35,8 @@ async function buyPremium() {
             throw new Error("Invalid payment order response");
         }
 
-        const cashfree = Cashfree({ mode: "sandbox" });
+        const cashfreeMode = response.data.cashfree_mode === "production" ? "production" : "sandbox";
+        const cashfree = Cashfree({ mode: cashfreeMode });
         sessionStorage.setItem("pendingPaymentOrderId", response.data.order_id);
 
         const requestedReturn = new URLSearchParams(window.location.search).get("return");

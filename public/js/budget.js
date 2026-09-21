@@ -155,8 +155,22 @@ function setOverallEditMode(editing) {
     clearButton.hidden = !editing;
 }
 
+function hasValidBudgetReauthToken() {
+    if (!budgetReauthToken) return false;
+
+    try {
+        const decoded = jwt_decode(budgetReauthToken);
+        return Boolean(decoded?.exp && Date.now() < decoded.exp * 1000);
+    } catch {
+        return false;
+    }
+}
+
 async function ensureBudgetReauth({ force = false } = {}) {
-    if (!force && budgetReauthToken) return true;
+    if (!force && hasValidBudgetReauthToken()) return true;
+
+    budgetReauthToken = null;
+    sessionStorage.removeItem("budgetReauthToken");
 
     const modal = document.getElementById("budgetPasswordModal");
     const form = document.getElementById("budgetPasswordForm");

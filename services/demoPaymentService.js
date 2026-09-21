@@ -145,30 +145,31 @@ const transferDemoCredits = async ({ userId, recipientPaymentId, amount, remark,
                 });
             }
 
+            const expenseCategory = getLocalCategory(cleanRemark) || "Other";
+
             const budgetResult = await enforceExpenseBudget({
                 userId: sender._id,
                 amount: amountMinor / 100,
-                category: "Other",
+                category: expenseCategory,
                 session
             });
             budgetChecks = budgetResult.checks;
 
             sender.demoBalanceMinor -= amountMinor;
+            sender.totalExpense = Number(sender.totalExpense || 0) + amountMinor / 100;
             receiver.demoBalanceMinor += amountMinor;
+
             await sender.save({ session });
             await receiver.save({ session });
 
             const createdExpenses = await Expense.create([{
                 amount: amountMinor / 100,
                 description: cleanRemark,
-                category: getLocalCategory(cleanRemark) || "Other",
+                category: expenseCategory,
                 note: `Demo transfer to ${receiver.name} (${receiver.email})`,
                 userId: sender._id
             }], { session });
             const expense = createdExpenses[0];
-
-            sender.totalExpense = Number(sender.totalExpense || 0) + amountMinor / 100;
-            await sender.save({ session });
 
             const transferId = `DEMO_${crypto.randomUUID().replace(/-/g, "")}`;
             const created = await DemoTransfer.create([{

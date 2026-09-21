@@ -27,9 +27,15 @@ function renderProfileCard(user) {
         .substring(0, 2)
         .toUpperCase();
 
-    const avatar = user.profileImage
-        ? `<img src="${user.profileImage}" alt="Profile image">`
-        : initials;
+    const safeProfileImage =
+        typeof user.profileImage === "string" &&
+        /^https?:\/\//i.test(user.profileImage)
+            ? user.profileImage
+            : null;
+
+    const avatar = safeProfileImage
+        ? `<img src="${escapeHtml(safeProfileImage)}" alt="Profile image">`
+        : escapeHtml(initials);
 
     const badge = user.isPremiumUser
         ? `<span class="acc-badge acc-badge-premium">Premium Member</span>`
@@ -45,8 +51,8 @@ function renderProfileCard(user) {
 
             <div class="acc-profile-info">
 
-                <h2>${user.name}</h2>
-                <p>${user.email}</p>
+                <h2>${escapeHtml(user.name)}</h2>
+                <p>${escapeHtml(user.email)}</p>
 
                 <div class="acc-profile-meta">
                     ${badge}

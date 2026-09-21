@@ -2,7 +2,8 @@ const crypto = require("crypto");
 const { Cashfree } = require("cashfree-pg");
 
 const CASHFREE_API_VERSION = "2022-09-01";
-const isProduction = process.env.CASHFREE_ENVIRONMENT === "production";
+const cashfreeEnvironment = String(process.env.CASHFREE_ENVIRONMENT || "sandbox").trim().toLowerCase();
+const isProduction = cashfreeEnvironment === "production";
 
 Cashfree.XClientId = process.env.CASHFREE_APP_ID;
 Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY;
@@ -10,10 +11,26 @@ Cashfree.XEnvironment = isProduction
     ? Cashfree.Environment.PRODUCTION
     : Cashfree.Environment.SANDBOX;
 
+if (process.env.NODE_ENV === "production" && !isProduction) {
+    console.warn("CASHFREE_ENVIRONMENT is not production while NODE_ENV=production.");
+}
+
 const getAppUrl = () => {
-    const appUrl = process.env.APP_URL;
+    const appUrl = (process.env.APP_URL || "").trim().replace(/\/+$/, "");
     if (!appUrl) throw new Error("APP_URL is required for payment callbacks");
-    return appUrl.replace(/\/+$/, "");
+
+    let parsed;
+    try {
+        parsed = new URL(appUrl);
+    } catch {
+        throw new Error("APP_URL must be a valid HTTP(S) URL");
+    }
+
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+        throw new Error("APP_URL must be a valid HTTP(S) URL");
+    }
+
+    return parsed.origin;
 };
 
 const toRupees = (amountMinor) => amountMinor / 100;

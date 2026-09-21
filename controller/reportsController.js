@@ -1,4 +1,87 @@
-const { Expense, ReportDownload } = require("../model");
+const { Expense, ReportDownload, BudgetRule } = require("../model");
+const { getPeriodBounds } = require("../services/budgetService");
+
+const OVERALL_LIMIT_FIELD = {
+    daily: "dailyLimitPaise",
+    weekly: "weeklyLimitPaise",
+    monthly: "monthlyLimitPaise"
+};
+
+const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+const parseDateOnly = (value) => {
+    if (typeof value !== "string" || !DATE_ONLY_PATTERN.test(value)) {
+        return null;
+    }
+
+    const [year, month, day] = value.split("-").map(Number);
+    const probe = new Date(Date.UTC(year, month - 1, day, 12));
+
+    if (
+        probe.getUTCFullYear() !== year ||
+        probe.getUTCMonth() !== month - 1 ||
+        probe.getUTCDate() !== day
+    ) {
+        return null;
+    }
+
+    return probe;
+};
+
+const addUtcDays = (date, days) =>
+    new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
+
+const getReportBounds = ({ type, date, customStartDate, customEndDate }) => {
+    if (customStartDate || customEndDate) {
+        if (!customStartDate || !customEndDate) {
+            return { error: "Both startDate and endDate are required for a custom report" };
+        }
+
+        const start = parseDateOnly(customStartDate);
+        const end = parseDateOnly(customEndDate);
+
+        if (!start || !end) {
+            return { error: "Invalid custom report dates" };
+        }
+
+        const startBounds = getPeriodBounds("daily", start);
+        const endBounds = getPeriodBounds("daily", addUtcDays(end, 1));
+
+        if (startBounds.start >= endBounds.start) {
+            return { error: "End date must be on or after start date" };
+        }
+
+        return {
+            start: startBounds.start,
+            end: endBounds.start,
+            reportType: "custom"
+        };
+    }
+
+    if (!["daily", "weekly", "monthly", "yearly"].includes(type)) {
+        return { error: "Invalid report type" };
+    }
+
+    const selectedDate = parseDateOnly(date);
+    if (!selectedDate) {
+        return { error: "A valid date in YYYY-MM-DD format is required" };
+    }
+
+    if (type === "yearly") {
+        const year = selectedDate.getUTCFullYear();
+        const start = getPeriodBounds("monthly", selectedDate).start;
+        const nextYear = parseDateOnly(`${year + 1}-01-01`);
+        const end = getPeriodBounds("monthly", nextYear).start;
+        return { start, end, reportType: type };
+    }
+
+    const bounds = getPeriodBounds(type, selectedDate);
+    return {
+        start: bounds.start,
+        end: bounds.end,
+        reportType: type
+    };
+};
 
 const getReport = async (req, res) => {
     try {
@@ -9,89 +92,65 @@ const getReport = async (req, res) => {
             endDate: customEndDate
         } = req.query;
 
-        let startDate;
-        let endDate;
+        const bounds = getReportBounds({
+            type,
+            date,
+            customStartDate,
+            customEndDate
+        });
 
-        if (customStartDate && customEndDate) {
-
-
-            startDate = new Date(customStartDate);
-            endDate = new Date(customEndDate);
-
-            endDate.setDate(endDate.getDate() + 1);
-
-        } else {
-
-            switch (type) {
-
-                case "daily":
-                    startDate = new Date(date);
-                    endDate = new Date(date);
-
-                    endDate.setDate(endDate.getDate() + 1);
-                    break;
-
-                case "weekly":
-                    startDate = new Date(date);
-                    endDate = new Date(date);
-
-                    endDate.setDate(endDate.getDate() + 7);
-                    break;
-
-                case "monthly":
-                    startDate = new Date(date);
-                    endDate = new Date(startDate);
-
-                    endDate.setMonth(endDate.getMonth() + 1);
-                    break;
-
-                case "yearly":
-                    startDate = new Date(date);
-                    endDate = new Date(startDate);
-
-                    endDate.setFullYear(
-                        endDate.getFullYear() + 1
-                    );
-                    break;
-
-                default:
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid report type"
-                    });
-            }
+        if (bounds.error) {
+            return res.status(400).json({
+                success: false,
+                message: bounds.error
+            });
         }
 
-        // Mongoose query
         const expenses = await Expense.find({
             userId: req.user._id,
             createdAt: {
-                $gte: startDate,
-                $lt: endDate
+                $gte: bounds.start,
+                $lt: bounds.end
             }
-        }).sort({
-            createdAt: -1
-        });
+        })
+            .sort({ createdAt: -1 })
+            .lean();
 
-        const totalExpense = expenses.reduce((sum, expense) => {
-            return sum + Number(expense.amount);
-        }, 0);
+        // Sum integer paise rather than floating-point rupees.
+        const totalPaise = expenses.reduce(
+            (sum, expense) => sum + Math.round(Number(expense.amount) * 100),
+            0
+        );
+        const totalExpense = totalPaise / 100;
 
-        res.status(200).json({
+        let savings = null;
+        const limitField = OVERALL_LIMIT_FIELD[bounds.reportType];
+
+        if (limitField) {
+            const budgetRule = await BudgetRule.findOne({
+                userId: req.user._id
+            }).lean();
+
+            const limitPaise = budgetRule?.[limitField] ?? null;
+
+            if (limitPaise !== null && limitPaise !== undefined) {
+                savings = (limitPaise - totalPaise) / 100;
+            }
+        }
+
+        return res.status(200).json({
             success: true,
             expenses,
-            totalExpense
+            totalExpense,
+            savings
         });
-
     } catch (err) {
+        console.error("Get report failed:", err.message);
 
-        console.log(err);
-
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Something went wrong"
         });
-
     }
 };
 

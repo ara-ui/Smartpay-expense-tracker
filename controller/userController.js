@@ -6,6 +6,8 @@ const { generateAccessToken } = require("../utils/jwt");
 const { getPeriodBounds } = require("../services/budgetService");
 const { ensurePaymentId } = require("../services/demoPaymentService");
 
+const DUMMY_PASSWORD_HASH = "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+
 
 //createuser
 
@@ -15,13 +17,33 @@ const createUser = async (req, res) => {
 
     try {
 
-        if (!name || !email || !password) {
+        if (
+            typeof name !== "string" ||
+            typeof email !== "string" ||
+            typeof password !== "string"
+        ) {
             return res.status(400).json({
-                message: "All fields are required",
+                success: false,
+                message: "Name, email and password are required"
             });
         }
 
-        const normalizedEmail = String(email).trim().toLowerCase();
+        const normalizedName = name.trim();
+        const normalizedEmail = email.trim().toLowerCase();
+
+        if (!normalizedName || normalizedName.length > 100) {
+            return res.status(400).json({
+                success: false,
+                message: "Name must be between 1 and 100 characters"
+            });
+        }
+
+        if (password.length < 5) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 5 characters"
+            });
+        }
         const emailPattern = /^\S+@\S+\.\S+$/;
 
         if (!emailPattern.test(normalizedEmail)) {
@@ -48,7 +70,7 @@ const createUser = async (req, res) => {
         const hash = await bcrypt.hash(password, 10);
 
         const user = await User.create({
-            name,
+            name: normalizedName,
             email: normalizedEmail,
             password: hash
         });
@@ -112,27 +134,17 @@ const loginUser = async (req, res) => {
 
         const user = await User.findOne({
             email: normalizedEmail
-        });
+        }).select("+password");
 
-        if (!user) {
+        const passwordHash = user?.password || DUMMY_PASSWORD_HASH;
+        const result = await bcrypt.compare(password, passwordHash);
 
-            return res.status(404).json({
+        if (!user || !result) {
+            return res.status(401).json({
                 success: false,
-                message: "User not found"
+                message: "Invalid email or password"
             });
-
         }
-
-            const result = await bcrypt.compare(password, user.password);
-
-            if (!result) {
-
-                return res.status(401).json({
-                    success: false,
-                    message: "User not authorized"
-                });
-
-            }
 
             // Password matched
             return res.status(200).json({
@@ -172,48 +184,6 @@ const loginUser = async (req, res) => {
     }
 
 };
-
-//income part starts here
-
-const updatedincome=async(req,res)=>{
-    try{
-        const{monthlyIncome}=req.body;
-
-        req.user.monthlyIncome=monthlyIncome;
-        await req.user.save();
-
-        res.status(200).json({
-            success:true,
-            monthlyIncome:req.user.monthlyIncome
-        });
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            success:false,
-            message:"Something went wrong"
-        });
-    }
-}
-
-
-//get income
-
-const getincome=async (req,res)=>{
-    try{
-        res.status(200).json({
-            success:true,
-            monthlyIncome:req.user.monthlyIncome
-        });
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            success:false,
-            message:"Something went wrong"
-        });
-    }
-}
 
 //quick statistics
 
@@ -280,7 +250,8 @@ const getMembership = async (req, res) => {
 
         const lastOrder = await Order.findOne({
             userId: req.user._id,
-            status: "SUCCESSFUL"
+            status: "SUCCESSFUL",
+            purpose: "PREMIUM_MEMBERSHIP"
         }).sort({ createdAt: -1 });
 
         res.status(200).json({
@@ -305,33 +276,4 @@ const getMembership = async (req, res) => {
 };
 
 
-const downloadExpenses = async (req, res) => {
-
-    try {
-
-
-        const expenses = await Expense.find({
-            userId: req.user._id
-        });
-
-        const data = JSON.stringify(expenses, null, 2);
-        const filename = `expenses-${req.user._id}-${Date.now()}.json`;
-
-        // Served directly from the app - no external storage involved.
-        res.setHeader("Content-Type", "application/json");
-        res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-        return res.status(200).send(data);
-
-    } catch (err) {
-
-        console.log(err);
-
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong"
-        });
-
-    }
-
-};
-module.exports = { createUser, loginUser,updatedincome ,getincome,downloadExpenses,getQuickStats,getMembership};
+module.exports = { createUser, loginUser, getQuickStats, getMembership };

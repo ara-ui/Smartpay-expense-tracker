@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const User = require("../model/User");
 const { CATEGORIES } = require("../utils/categories");
 const {
     getBudgetStatus,
@@ -35,10 +36,10 @@ exports.verifyBudgetPassword = async (req, res) => {
             });
         }
 
-        const user = await require("../model/User").findById(req.user._id).select("+password");
+        const user = await User.findById(req.user._id).select("+password");
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({
+            return res.status(403).json({
                 success: false,
                 message: "Incorrect password"
             });

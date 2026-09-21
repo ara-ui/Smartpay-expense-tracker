@@ -28,31 +28,23 @@ const sendMail = async (receiverEmail, id) => {
 
             subject: "Reset Your Password",
 
-            htmlContent: `
+           htmlContent: `
                 <h2>Smart Pay</h2>
                 <p>Click the button below to reset your password.</p>
 
-                <a href="http://localhost:3000/password/resetpassword/${id}">
+                <a href="${process.env.APP_URL}/password/resetpassword/${id}">
                     Reset Password
                 </a>
             `
+            
         });
 
         console.log("Mail sent successfully");
-        console.log(response);
-
         return response;
 
     } catch (err) {
 
-        console.log("BREVO ERROR:");
-
-        // Print the full error
-        console.log(err);
-
-        // Print Brevo response if available
-        console.log(err.response?.body);
-
+        console.error("Brevo email error:", err.message);
         throw err;   // Let the controller know the mail failed
     }
 };
@@ -122,16 +114,12 @@ const sendChangePasswordOTP = async (receiverEmail, otp) => {
         });
 
         console.log("Change password OTP email sent successfully");
-
         return response;
 
     }
     catch (err) {
 
-        console.log("BREVO CHANGE PASSWORD ERROR:");
-        console.log(err);
-        console.log(err.response?.body);
-
+        console.error("Brevo change-password email error:", err.message);
         throw err;
 
     }
