@@ -6,7 +6,7 @@ The application helps users track expenses, manage budgets, understand spending 
 
 ## Live Demo
 
-Live Application: Add your deployed application URL here.
+Live Application: https://smartpay-expense-tracker.onrender.com
 
 ## Demo Video
 
