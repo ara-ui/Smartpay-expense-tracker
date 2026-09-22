@@ -1,49 +1,50 @@
 # Smart Pay
 
-An AI-powered personal finance management platform built with Node.js, Express, MongoDB, and modern web technologies. The application helps users track expenses, manage budgets, understand spending patterns, receive intelligent insights, generate reports, and explore premium financial features.
+Smart Pay is an AI-powered personal finance management platform built with Node.js, Express, MongoDB, and modern web technologies.
 
-## 🚀 Live Demo
+The application helps users track expenses, manage budgets, understand spending patterns, receive intelligent insights, generate reports, manage premium membership, and explore payment features.
 
-**Live Application:** 
+## Live Demo
 
+Live Application: Add your deployed application URL here.
 
-## 🎥 Demo Video
+## Demo Video
 
-**Project Walkthrough:** 
+Project Walkthrough: Add your demo video URL here.
 
-
-## 📌 About the Project
+## About the Project
 
 Managing personal expenses is often more difficult than simply recording transactions. Users may know how much they spend without having a clear view of their spending patterns, budget usage, or areas where they can improve.
 
-Smart Pay was built as a product-oriented capstone project to address this problem.
+Smart Pay was developed as a product-oriented capstone project to provide a single platform for:
 
-The application provides a single platform where users can:
+- Recording and categorizing expenses
+- Monitoring overall and category-wise spending
+- Setting daily, weekly, and monthly budgets
+- Receiving budget alerts and spending insights
+- Using AI-assisted expense categorization
+- Generating expense reports
+- Tracking report download history
+- Managing premium membership
+- Making and tracking payments
+- Demonstrating internal wallet transfers through a clearly labelled simulated wallet feature
 
-- Record and categorize expenses
-- Monitor overall and category-wise spending
-- Set daily, weekly, and monthly budgets
-- Receive budget alerts and spending insights
-- Use AI-assisted expense categorization
-- Generate expense reports
-- Track report download history
-- Manage premium membership
-- Make and track payments
-- Use a clearly labelled simulated wallet-transfer feature for product demonstration
+## Key Features
 
-## ✨ Key Features
+### Authentication and Account Management
 
-### 🔐 Authentication & Account Management
 - User registration and login
 - Password hashing with bcrypt
 - JWT-based authentication
 - Forgot-password flow
 - Password reset
 - Change-password flow with OTP verification
-- Protected routes and premium-only access
+- Protected routes
+- Premium-only access
 - Authentication rate limiting
 
-### 💰 Expense Management
+### Expense Management
+
 - Add and delete expenses
 - Expense categories
 - Expense history
@@ -51,8 +52,9 @@ The application provides a single platform where users can:
 - Highest-spending category tracking
 - Pagination for expense data
 
-### 🎯 Budget Management
-- Overall daily, weekly, and monthly spending limits
+### Budget Management
+
+- Daily, weekly, and monthly spending limits
 - Category-specific budget limits
 - Budget usage tracking
 - Budget status monitoring
@@ -60,7 +62,8 @@ The application provides a single platform where users can:
 - Budget audit logging
 - Protected budget changes requiring re-authentication
 
-### 🤖 AI-Powered Insights
+### AI-Powered Insights
+
 - AI-assisted expense categorization using Google Gemini
 - Local rule-based categorization fallback
 - Daily spending insights
@@ -68,7 +71,8 @@ The application provides a single platform where users can:
 - Category spending trends
 - Budget-status insights
 
-### 📊 Reports & Analytics
+### Reports and Analytics
+
 - Daily reports
 - Weekly reports
 - Monthly reports
@@ -78,7 +82,8 @@ The application provides a single platform where users can:
 - Report download history
 - Download-again workflow
 
-### 💳 Premium & Payments
+### Premium and Payments
+
 - Premium membership
 - Cashfree payment integration
 - Payment order creation and status handling
@@ -88,10 +93,12 @@ The application provides a single platform where users can:
 - Payment history
 - Transaction records
 
-### 💸 Demo Wallet / SmartPay
-The application includes a **clearly labelled simulated payment mode** for demonstrating internal transfers without representing real bank or wallet funds.
+### SmartPay Demo Wallet
+
+The application includes a clearly labelled simulated payment mode for demonstrating internal transfers without representing real bank or wallet funds.
 
 Features include:
+
 - Demo wallet balance
 - System-generated SmartPay payment ID
 - Send money between registered users
@@ -99,36 +106,41 @@ Features include:
 - Transfer history
 - Idempotency protection
 - Balance tracking
-- Money sent/received notifications
+- Money sent and received notifications
 
-### 🔔 Notifications
+### Notifications
+
 - Budget alerts
 - Budget exceeded notifications
 - Money sent notifications
 - Money received notifications
 - Read/unread notification state
 
-### ☁️ External Services
-- MongoDB database
-- Google Gemini integration for AI categorization
+### External Services
+
+- MongoDB
+- Google Gemini for AI categorization
 - Cashfree for payment processing
 - Brevo for email-related functionality
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
+
 - Node.js
 - Express.js
 - MongoDB
 - Mongoose
 
 ### Frontend
+
 - HTML5
 - CSS3
 - JavaScript
 - Axios
 
-### Authentication & Security
+### Authentication and Security
+
 - JWT
 - bcrypt
 - Helmet
@@ -138,53 +150,54 @@ Features include:
 - Environment-based secrets
 
 ### Integrations
+
 - Google Gemini
 - Cashfree Payments
-- 
 - Brevo Email API
 
 ### Testing
+
 - Node.js built-in test runner
 
-## 🏗️ Application Architecture
+## Application Architecture
 
 The application follows a layered backend structure:
 
 ```text
-                    ┌──────────────────────┐
-                    │      Frontend        │
-                    │ HTML / CSS / JS      │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │    Express.js API    │
-                    └──────────┬───────────┘
-                               │
-             ┌─────────────────┼─────────────────┐
-             ▼                 ▼                 ▼
-       Middleware          Controllers        Routes
-             │                 │                 │
-             └─────────────────┼─────────────────┘
-                               ▼
-                         Service Layer
-                               │
-              ┌────────────────┼────────────────┐
-              ▼                ▼
+                    Frontend
+                 HTML / CSS / JS
+                       |
+                       v
+                 Express.js API
+                       |
+          +------------+------------+
+          |            |            |
+          v            v            v
+      Middleware   Controllers    Routes
+          |            |            |
+          +------------+------------+
+                       |
+                       v
+                 Service Layer
+                       |
+             +---------+---------+
+             |                   |
+             v                   v
           MongoDB          External APIs
-                              │
-                    ┌─────────┼─────────┐
-                    ▼         ▼         ▼
-                 Gemini   Cashfree    Brevo
+                              |
+                     +--------+--------+
+                     |        |        |
+                     v        v        v
+                   Gemini  Cashfree  Brevo
 ```
 
-The project separates routing, authentication middleware, controllers, services, models, and utility logic to keep responsibilities organized and easier to maintain.
+The project separates routing, authentication middleware, controllers, services, models, and utility logic to keep responsibilities organized and maintainable.
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
-smart pay-expense-tracker-full/
-│
+smart-expense-tracker-full/
+|
 ├── controller/          # Request handlers
 ├── middleware/          # Authentication, authorization, rate limiting, errors
 ├── model/               # Mongoose schemas and database models
@@ -192,16 +205,16 @@ smart pay-expense-tracker-full/
 ├── services/            # Business logic and external integrations
 │   └── payments/        # Payment provider and transaction services
 ├── utils/               # Shared utilities and validation helpers
-├── public/               # Frontend HTML, CSS and JavaScript
-├── test/                 # Automated tests
-├── app.js                # Express application entry point
-├── db.js                 # MongoDB connection
+├── public/              # Frontend HTML, CSS and JavaScript
+├── test/                # Automated tests
+├── app.js               # Express application entry point
+├── db.js                # MongoDB connection
 ├── package.json
 ├── package-lock.json
 └── README.md
 ```
 
-## 🗄️ Database
+## Database
 
 MongoDB is used as the primary database with Mongoose.
 
@@ -223,11 +236,11 @@ Main data models include:
 
 Indexes and unique constraints are used for frequently queried data and important integrity requirements such as idempotency and duplicate prevention.
 
-## 🔌 API Overview
+## API Overview
 
 The backend exposes REST-style endpoints for the main product areas.
 
-### Authentication & Users
+### Authentication and Users
 
 ```text
 POST   /users
@@ -298,7 +311,7 @@ POST /password/changepassword/request
 POST /password/changepassword/verify
 ```
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 Create a `.env` file in the project root.
 
@@ -306,6 +319,7 @@ Example configuration:
 
 ```env
 PORT=3000
+
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 
@@ -328,9 +342,9 @@ DEMO_PAYMENTS_ENABLED=true
 MONGODB_DNS_OVERRIDE=false
 ```
 
-**Never commit the real `.env` file or API keys to GitHub.**
+Never commit the real `.env` file or API keys to GitHub.
 
-## 🏃 Running the Project Locally
+## Running the Project Locally
 
 ### 1. Clone the repository
 
@@ -374,9 +388,9 @@ http://localhost:3000
 npm run dev
 ```
 
-## 🧪 Testing
+## Testing
 
-The project includes automated tests using the Node.js built-in test runner.
+The project uses the Node.js built-in test runner.
 
 Run:
 
@@ -388,10 +402,10 @@ The test suite includes coverage for important application behavior such as:
 
 - AI expense categorization
 - Category fallback behavior
-- Budget/payment smoke flows
+- Budget and payment smoke flows
 - Regression protection for previously identified bugs
 
-## 🔐 Security & Reliability Considerations
+## Security and Reliability
 
 The application includes several backend-focused security and reliability measures:
 
@@ -412,11 +426,9 @@ The application includes several backend-focused security and reliability measur
 - Integer minor-unit/paise handling for budget and payment amounts where applicable
 - Clearly separated demo-payment functionality to avoid representing simulated funds as real money
 
-## 📈 System Design Considerations
+## System Design Considerations
 
-The project was designed with scalability and maintainability in mind.
-
-### Separation of responsibilities
+### Separation of Responsibilities
 
 Routes handle endpoint definitions, controllers handle HTTP-level operations, services contain business logic, and models manage database persistence.
 
@@ -424,11 +436,11 @@ Routes handle endpoint definitions, controllers handle HTTP-level operations, se
 
 Payment and demo-transfer workflows use idempotency-related identifiers and database constraints to help prevent duplicate processing.
 
-### Database consistency
+### Database Consistency
 
 Important entities use unique indexes and validation rules to reduce duplicate or invalid records.
 
-### External dependency failures
+### External Dependency Failures
 
 AI categorization includes a local rule-based fallback so expense categorization can still function when the external AI service is unavailable.
 
@@ -436,16 +448,16 @@ AI categorization includes a local rule-based fallback so expense categorization
 
 Paginated access is used for data sets that can grow over time, such as expenses, transactions, and report history.
 
-## ⚠️ Limitations
+## Limitations
 
 - AI categorization depends on the availability and limits of the configured Gemini API.
-- Cashfree payment functionality depends on the payment provider and configured sandbox/production credentials.
+- Cashfree payment functionality depends on the payment provider and configured sandbox or production credentials.
 - The SmartPay wallet is a simulated demonstration feature and does not represent real bank or payment-provider funds.
 - External services such as Gemini, Cashfree, and Brevo require valid credentials and may be subject to provider availability, quotas, or sandbox restrictions.
 - The current application is designed as a capstone/portfolio product rather than a production banking or financial institution system.
 - Large-scale deployments would require additional infrastructure such as caching, background processing, monitoring, and horizontal scaling.
 
-## 🔮 Future Improvements
+## Future Improvements
 
 Potential future enhancements include:
 
@@ -459,11 +471,11 @@ Potential future enhancements include:
 - Expanded monitoring and observability
 - More advanced recommendation and anomaly-detection features
 
-## 🎯 Capstone Objective
+## Capstone Objective
 
-This project was developed as a Node.js backend capstone with a product-oriented approach.
+Smart Pay was developed as a Node.js backend capstone with a product-oriented approach.
 
-The goal was not only to build CRUD functionality, but to demonstrate practical backend concepts including:
+The goal was not only to build CRUD functionality, but also to demonstrate practical backend concepts including:
 
 - REST API development
 - Authentication and authorization
@@ -479,10 +491,8 @@ The goal was not only to build CRUD functionality, but to demonstrate practical 
 - Testing
 - System design and scalability considerations
 
-## 👩‍💻 Author
+## Author
 
 Mehnaz Ara Islam
 
 B.Tech in Computer Engineering
-
-
