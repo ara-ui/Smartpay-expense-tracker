@@ -481,10 +481,8 @@ The goal was not only to build CRUD functionality, but to demonstrate practical 
 
 ## 👩‍💻 Author
 
-**Mehnaz Ara Islam**
+Mehnaz Ara Islam
 
 B.Tech in Computer Engineering
 
-GitHub: **[Add your GitHub profile link]**
 
-LinkedIn: **[Add your LinkedIn profile link]**
