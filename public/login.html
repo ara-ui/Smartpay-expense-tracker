@@ -1,42 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/theme.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-visual-card" aria-label="SmartPay overview">
+            <div>
+                <div class="auth-brand auth-brand-left">
+                    <span class="smartpay-mark" aria-hidden="true">S</span>
+                    <span class="auth-brand-name">SmartPay</span>
+                </div>
+                <p class="auth-eyebrow">SMARTER MONEY MANAGEMENT</p>
+                <h1 class="auth-visual-title">See where your money actually goes.</h1>
+                <p class="auth-visual-subtitle">Track your spending, stay within your budgets, and understand your financial habits before the month runs out.</p>
 
-        <script src="js/theme.js"></script>
-        <link rel="stylesheet" href="css/theme.css">
-        <link rel="stylesheet" href="css/auth.css">
-    </head>
-    <body class="auth-page">
+                <div class="auth-chart" aria-hidden="true">
+                    <div class="chart-grid"></div>
+                    <svg viewBox="0 0 420 150" role="presentation">
+                        <defs>
+                            <linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#2dd4bf" stop-opacity=".24"/>
+                                <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M8 118 C55 104 72 112 105 88 S162 92 191 66 S244 79 272 54 S327 62 351 35 S390 42 412 18 L412 150 L8 150 Z" fill="url(#chartFill)"/>
+                        <path d="M8 118 C55 104 72 112 105 88 S162 92 191 66 S244 79 272 54 S327 62 351 35 S390 42 412 18" fill="none" stroke="#2dd4bf" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="412" cy="18" r="6" fill="#2dd4bf"/>
+                    </svg>
+                </div>
 
-        <div class="auth-card">
-            <div class="auth-brand">
-                <span class="auth-brand-icon">💰</span>
-                <span class="auth-brand-name">Smart Pay</span>
+                <ul class="auth-benefits">
+                    <li><span>✓</span><span>AI-assisted expense categorization</span></li>
+                    <li><span>✓</span><span>Real-time budget tracking</span></li>
+                    <li><span>✓</span><span>Insights that help you save more</span></li>
+                </ul>
             </div>
+            <p class="auth-trust"><span>●</span> Secure account access with JWT authentication</p>
+        </section>
 
-            <h1 class="auth-title">Welcome back</h1>
-          
+        <section class="auth-card">
+            <div class="auth-form-brand">
+                <span class="smartpay-mark small" aria-hidden="true">S</span>
+                <span class="auth-brand-name">SmartPay</span>
+            </div>
+            <h2 class="auth-title">Welcome back</h2>
+            <p class="auth-subtitle">Log in to check your spending and stay on budget.</p>
+
             <form id="loginForm" novalidate>
                 <label for="email">Email</label>
                 <input type="email" id="email" autocomplete="email" required>
-
                 <label for="password">Password</label>
                 <input type="password" id="password" autocomplete="current-password" required>
-
                 <p id="loginMessage" class="auth-message" role="alert"></p>
-
                 <button type="submit" class="auth-submit login-btn" id="loginSubmitBtn">Log In</button>
             </form>
-
             <p class="auth-links"><a href="forgotpassword.html">Forgot your password?</a></p>
-            <a href="signup.html" class="auth-foot-link signup-link">New here? Create an account</a>
-        </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script src="js/apiConfig.js"></script>
-        <script src="js/login.js"></script>
+            <a href="signup.html" class="auth-foot-link signup-link">New to SmartPay? Create an account</a>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/apiConfig.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>
