@@ -296,7 +296,11 @@ resetFilterBtn.addEventListener("click", () => {
 });
 
 
-
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value ?? "";
+    return div.innerHTML;
+}
 
 async function getReport() {
 
