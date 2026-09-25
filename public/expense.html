@@ -21,72 +21,89 @@
         <div id="premiumNav" class="premium-nav">
           
 
-<main class="page-content">
-    <section id="dailyInsightCard" class="insight-card" hidden>
-        <p class="insight-eyebrow">DAILY INSIGHT</p>
-        <ul id="insightList" class="insight-list"></ul>
+<main class="page-content dashboard-page">
+    <section id="dailyInsightCard" class="dashboard-insight-strip" hidden aria-labelledby="dashboardGreeting">
+        <div class="insight-strip-copy">
+            <h1 id="dashboardGreeting">Good to see you</h1>
+            <p id="dailyInsightMessage" class="insight-message"></p>
+        </div>
+        <div class="insight-actions" aria-label="Dashboard shortcuts">
+            <a href="budget.html" class="focus-link">View Budget</a>
+            <a href="reports.html" class="focus-link secondary">Open Reports</a>
+        </div>
     </section>
 
-    <h3 class="section-heading">Add Expense</h3>
+    <section class="dashboard-expense-section" aria-labelledby="addExpenseHeading">
+        <div class="section-header-row">
+            <div>
+                
+                <div class="leaderboard-hero-text"><h1>Add an expense</h1></div>
+                <p>Record a purchase and let SmartPay categorize it.</p>
+            </div>
+        </div>
 
         <form id="expenseForm">
-            <label>Choose expense amount</label>
-            <input type="number" id="amount" required>
+            <div class="expense-field">
+                <label for="amount">Amount</label>
+                <div class="currency-input">
+                    <span>₹</span>
+                    <input type="number" id="amount" min="0.01" step="0.01" placeholder="0.00" required>
+                </div>
+            </div>
 
-            <label >Description</label>
-            <input type="text" id="description" required>
+            <div class="expense-field expense-description-field">
+                <label for="description">Description</label>
+                <input type="text" id="description" placeholder="e.g. Dinner, groceries, cab" required>
+            </div>
 
-        
             <button type="submit">Add Expense</button>
         </form>
+    </section>
 
-        <div id="loading" class="is-hidden">
+    <div id="loading" class="is-hidden">
         <div class="spinner"></div>
         <p>Categorizing expense with AI...</p>
     </div>
 
-
-
-        <h1 class="section-heading">Expenses</h1>
-        <!--drop down page limit-->
-
-        <div class="top-controls">
+    <section class="expenses-section" aria-labelledby="expensesHeading">
+        <div class="section-header-row expenses-header-row">
+            <div>
+              
+                <h2 id="expensesHeading">Recent expenses</h2>
+                <p>Your recorded expenses, newest first.</p>
+            </div>
 
             <div class="page-limit">
-
-                <label for="rowsPerPage">Expenses per page:</label>
-
+                <label for="rowsPerPage">Rows</label>
                 <select id="rowsPerPage">
                     <option value="5">5</option>
                     <option value="10" selected>10</option>
                     <option value="20">20</option>
                     <option value="50">50</option>
                 </select>
-
             </div>
-
-            
-
         </div>
 
+        <div class="expense-table-card">
+            <div class="expense-table-wrapper">
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseList"></tbody>
+                </table>
+            </div>
+        </div>
 
-    <table class="expense-table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody id="expenseList"></tbody>
-    </table>
-
-    <div id="pagination"></div>
-
+        <div id="pagination"></div>
+    </section>
 </main>
 
     

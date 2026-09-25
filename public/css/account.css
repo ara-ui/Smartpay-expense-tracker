@@ -577,3 +577,29 @@ body {
     .report-history-item { flex-direction: column; align-items: flex-start; }
     .report-history-again { align-self: flex-start; }
 }
+
+/* ---- SmartPay account polish ---- */
+.account-container { padding-top: 34px; }
+.account-title {
+    font-size: clamp(28px, 4vw, 36px);
+    letter-spacing: -.025em;
+    margin-bottom: 26px;
+}
+.acc-card {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 26px;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.acc-card:hover { box-shadow: var(--shadow-md); }
+.acc-profile-card {
+    background: linear-gradient(135deg, var(--primary-soft), var(--card) 62%);
+    border-color: color-mix(in srgb, var(--primary) 18%, var(--border));
+}
+.acc-profile-avatar { box-shadow: 0 10px 24px rgba(37,99,235,.18); }
+.acc-card-title { letter-spacing: -.01em; }
+.acc-membership-details > div { padding: 14px 16px; border-radius: var(--radius-md); background: var(--surface-secondary); border: 1px solid var(--border); }
+.acc-detail-value { font-size: 17px; }
+.acc-badge-premium { color: var(--warning); }
+.acc-shortcut-card { min-height: 74px; }
+@media (max-width: 700px) { .account-container { padding-top: 24px; } .acc-card { padding: 20px; } }

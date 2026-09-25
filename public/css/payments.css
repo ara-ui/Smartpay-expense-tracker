@@ -303,3 +303,38 @@ html.dark-theme .spending-guard { box-shadow: none; }
     .spending-guard { align-items: flex-start; flex-direction: column; }
     .payment-detail-grid { grid-template-columns: 1fr; }
 }
+
+/* ---- SmartPay wallet polish ---- */
+.payments-page { padding-top: 34px; }
+.payments-header h1 { font-size: clamp(28px, 4vw, 38px); letter-spacing: -.025em; }
+.wallet-card {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary) 0%, #2563eb 55%, var(--accent) 100%);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 16px 36px rgba(37,99,235,.18);
+}
+.wallet-card::after {
+    content: "";
+    position: absolute;
+    width: 220px; height: 220px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 50%;
+    right: -80px; top: -110px;
+}
+.wallet-card h2, .wallet-card .wallet-balance { color: #fff; }
+.wallet-card .wallet-id-row { background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.18); }
+.wallet-card .wallet-id-label, .wallet-card .wallet-note { color: rgba(255,255,255,.76); }
+.wallet-card .wallet-id-row strong { color: #fff; }
+.wallet-status { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); color: #fff; }
+.wallet-action.primary { background: #fff; color: var(--primary); }
+.wallet-action.primary:hover { background: #f8fafc; }
+.wallet-action:not(.primary) { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.5); }
+.wallet-action:not(.primary):hover { background: rgba(255,255,255,.15); }
+.wallet-card .copy-button { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.25); }
+.wallet-card .copy-button:hover { background: rgba(255,255,255,.2); color: #fff; }
+.recent-section { margin-top: 34px; }
+.payment-list { box-shadow: var(--shadow-sm); }
+.payment-row-button:hover { background: var(--primary-soft); }
+@media (max-width: 650px) { .payments-page { padding-top: 24px; } }

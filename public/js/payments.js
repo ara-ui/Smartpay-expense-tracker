@@ -23,6 +23,12 @@ const formatDate = (value) => new Date(value).toLocaleString("en-IN", {
 const escapeHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+const maskPaymentId = (value) => {
+    const id = String(value || "");
+    if (!id) return "Unavailable";
+    const at = id.indexOf("@");
+    return at > 0 ? `${"•".repeat(Math.min(Math.max(at, 6), 12))}${id.slice(at)}` : "•".repeat(Math.min(Math.max(id.length, 8), 14));
+};
 
 // Last-known wallet snapshot, keyed to the current session's token so it
 // never leaks between different logged-in users on the same browser. Used
@@ -124,7 +130,7 @@ const loadWalletOnly = async () => {
         currentPaymentId = wallet.paymentId || "";
         currentEmail = String(wallet.email || "").toLowerCase();
         demoBalance.textContent = formatMoney(wallet.balanceMinor);
-        demoPaymentId.textContent = wallet.paymentId || "Unavailable";
+        demoPaymentId.textContent = maskPaymentId(wallet.paymentId);
         receivePaymentId.textContent = wallet.paymentId || "Unavailable";
         retryWalletButton.hidden = true;
         writeWalletCache(wallet);
@@ -166,7 +172,7 @@ const cachedWallet = readWalletCache();
 if (cachedWallet) {
     if (typeof cachedWallet.balanceMinor === "number") demoBalance.textContent = formatMoney(cachedWallet.balanceMinor);
     if (cachedWallet.paymentId) {
-        demoPaymentId.textContent = cachedWallet.paymentId;
+        demoPaymentId.textContent = maskPaymentId(cachedWallet.paymentId);
         receivePaymentId.textContent = cachedWallet.paymentId;
     }
 }

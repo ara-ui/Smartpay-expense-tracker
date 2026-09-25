@@ -625,3 +625,83 @@ html.dark-theme .notification-badge {
 html.dark-theme .notification-dropdown {
     box-shadow: 0 16px 40px rgba(0, 0, 0, .5);
 }
+
+/* =========================================================
+   SMARTPAY SHARED HEADER V2
+   ========================================================= */
+#userHeaderContainer { margin-bottom: 0; }
+.app-header {
+    background: linear-gradient(90deg, #eaf2ff 0%, #f7faff 48%, #e7f8f5 100%);
+    border-bottom: 1px solid #cbdcf3;
+    box-shadow: 0 3px 16px rgba(37, 99, 235, .10);
+}
+.header-container { padding: 14px 0; }
+.brand-link { display:flex; align-items:center; gap:11px; text-decoration:none; }
+.app-logo-icon {
+    width:42px;
+    height:42px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    background:linear-gradient(145deg, #2563eb, #1748b0);
+    color:#fff;
+    font-size:20px;
+    font-weight:900;
+    box-shadow:0 7px 18px rgba(37,99,235,.22);
+}
+.app-title { font-size:21px; color:#0f1f38; }
+.header-right { gap:8px; }
+.payment-btn,
+.notification-btn {
+    min-width:42px;
+    height:42px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #d9e3f1;
+    border-radius:11px;
+    background:#fff;
+    color:#17345e;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:800;
+    box-shadow:0 2px 7px rgba(15,23,42,.05);
+}
+.payment-btn:hover,
+.notification-btn:hover { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; }
+.notification-btn { border-radius:11px; }
+.notification-icon { font-size:17px; font-weight:900; color:#2563eb; }
+.user-avatar-btn { box-shadow:0 5px 13px rgba(37,99,235,.22); }
+.account-area { position:relative; }
+.user-dropdown { top:calc(100% + 10px); z-index:1000; }
+.app-nav { background:#fff; border-bottom:1px solid #e2e8f0; box-shadow:0 2px 9px rgba(15,23,42,.04); }
+.nav-inner { max-width:1300px; width:90%; margin:0 auto; }
+.nav-link { position:relative; padding:17px 16px 15px; color:#475569; font-weight:750; }
+.nav-link::after { content:""; position:absolute; left:14px; right:14px; bottom:0; height:3px; border-radius:3px 3px 0 0; background:transparent; }
+.nav-link:hover { color:#2563eb; background:#f8fbff; }
+.nav-link.active { color:#2563eb; background:#f8fbff; }
+.nav-link.active::after { background:#2563eb; }
+.nav-lock { margin-left:5px; padding:3px 6px; border-radius:999px; background:#eff6ff; color:#2563eb; font-size:9px; letter-spacing:.04em; }
+
+@media (max-width:700px) {
+    .header-container { width:94%; }
+    .app-title { font-size:18px; }
+    .app-logo-icon { width:38px; height:38px; }
+    .payment-btn { min-width:38px; }
+    .nav-inner { width:100%; overflow-x:auto; }
+    .nav-link { flex:0 0 auto; padding-left:13px; padding-right:13px; }
+}
+
+
+html.dark-theme .app-header {
+    background: linear-gradient(90deg, #14254a 0%, #17233d 48%, #103d3a 100%);
+    border-bottom-color: #334155;
+    box-shadow: 0 3px 16px rgba(0,0,0,.28);
+}
+html.dark-theme .app-title { color: #f8fafc; }
+html.dark-theme .payment-btn,
+html.dark-theme .notification-btn {
+    background: #1f2937;
+    border-color: #475569;
+    color: #e2e8f0;
+}

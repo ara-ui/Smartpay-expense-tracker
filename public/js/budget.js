@@ -54,6 +54,7 @@ let budgetRules = null;
 let budgetStatus = null;
 let budgetReauthToken = sessionStorage.getItem("budgetReauthToken");
 let overallEditMode = false;
+let categoryEditMode = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
     const user = requireAuth();
@@ -91,6 +92,10 @@ function bindEvents() {
     document
         .getElementById("editOverallLimitsBtn")
         .addEventListener("click", toggleOverallEditMode);
+
+    document
+        .getElementById("setCategoryLimitsBtn")
+        .addEventListener("click", toggleCategoryEditMode);
 }
 
 async function loadBudgetPage() {
@@ -141,6 +146,9 @@ function renderOverallInputs() {
 function setOverallEditMode(editing) {
     overallEditMode = editing;
 
+    const form = document.getElementById("overallBudgetForm");
+    form.hidden = !editing;
+
     ["dailyLimitInput", "weeklyLimitInput", "monthlyLimitInput"].forEach((id) => {
         document.getElementById(id).disabled = !editing;
     });
@@ -149,7 +157,7 @@ function setOverallEditMode(editing) {
     const saveButton = document.getElementById("saveOverallLimitsBtn");
     const clearButton = document.getElementById("clearOverallLimitsBtn");
 
-    editButton.textContent = editing ? "Cancel edit" : "Edit limits";
+    editButton.textContent = editing ? "Close budget editor" : "Update Budget Limits";
     editButton.classList.toggle("editing", editing);
     saveButton.hidden = !editing;
     clearButton.hidden = !editing;
@@ -249,6 +257,33 @@ async function toggleOverallEditMode() {
     if (!(await ensureBudgetReauth({ force: true }))) return;
     setOverallEditMode(true);
     renderOverallInputs();
+}
+
+function closeCategoryEditMode() {
+    const form = document.getElementById("categoryBudgetForm");
+    const list = document.getElementById("categoryLimitsList");
+    const button = document.getElementById("setCategoryLimitsBtn");
+
+    categoryEditMode = false;
+    form.hidden = true;
+    list.hidden = true;
+    button.querySelector("span:last-child").textContent = "Set Category Limits";
+}
+
+async function toggleCategoryEditMode() {
+    if (categoryEditMode) {
+        closeCategoryEditMode();
+        return;
+    }
+
+    if (!(await ensureBudgetReauth({ force: true }))) return;
+
+    categoryEditMode = true;
+    document.getElementById("categoryBudgetForm").hidden = false;
+    document.getElementById("categoryLimitsList").hidden = false;
+    document.getElementById("setCategoryLimitsBtn")
+        .querySelector("span:last-child").textContent = "Close Category Limits";
+    document.getElementById("categoryInput").focus();
 }
 
 function getStatusEntry(period, category = null) {
@@ -525,7 +560,7 @@ async function saveCategoryLimit(event) {
 
         setButtonBusy(button, true, "Saving...", "Add / Update limit");
 
-        if (!(await ensureBudgetReauth({ force: true }))) return;
+        if (!(await ensureBudgetReauth())) return;
 
         const response = await api.post("/budget/rules/category", {
             category,
@@ -538,6 +573,7 @@ async function saveCategoryLimit(event) {
 
         document.getElementById("categoryLimitInput").value = "";
         setMessage(messageEl, "Category limit saved.", "success");
+        closeCategoryEditMode();
     } catch (error) {
         console.error("Saving category limit failed:", error);
         setMessage(

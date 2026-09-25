@@ -1,4 +1,6 @@
 
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap");
+
 :root {
     --bg: #f5f7fb;
     --card: #ffffff;
@@ -31,6 +33,8 @@
     --danger-soft: #fef2f2;
     --info: #0ea5e9;
     --info-soft: #f0f9ff;
+    --accent: #0f766e;
+    --accent-soft: #f0fdfa;
 
     --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .06);
     --shadow-md: 0 4px 12px rgba(15, 23, 42, .08);
@@ -54,7 +58,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html.dark-theme {
@@ -85,6 +89,8 @@ html.dark-theme {
     --danger-soft: rgba(248, 113, 113, .14);
     --info: #38bdf8;
     --info-soft: rgba(56, 189, 248, .14);
+    --accent: #2dd4bf;
+    --accent-soft: rgba(45, 212, 191, .10);
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, .35);
@@ -704,3 +710,65 @@ html.dark-theme .alert-info { border-color: transparent; }
 .badge-warning { background: var(--warning-soft); color: var(--warning); }
 .badge-danger  { background: var(--danger-soft); color: var(--danger); }
 .badge-neutral { background: var(--surface-secondary); color: var(--text-secondary); border: 1px solid var(--border); }
+
+
+/* =========================================================
+   SMARTPAY SHARED PAGE TYPOGRAPHY V3
+   ========================================================= */
+:root {
+    --page-title-size: 32px;
+    --page-title-line-height: 1.15;
+    --page-title-weight: 800;
+}
+
+/* Main page titles use one consistent type scale.
+   Dashboard/auth hero headings intentionally keep their own visual treatment. */
+.account-title,
+.budget-page-header h1,
+.leaderboard-hero-text h1,
+.reports-header-row h1,
+.payments-header h1,
+.history-header h1,
+.payment-card h1,
+.premium-card h1 {
+    font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: var(--page-title-size) !important;
+    line-height: var(--page-title-line-height) !important;
+    font-weight: var(--page-title-weight) !important;
+    letter-spacing: -.03em !important;
+    color: var(--primary) !important;
+}
+
+html.dark-theme .account-title,
+html.dark-theme .budget-page-header h1,
+html.dark-theme .leaderboard-hero-text h1,
+html.dark-theme .reports-header-row h1,
+html.dark-theme .payments-header h1,
+html.dark-theme .history-header h1,
+html.dark-theme .payment-card h1,
+html.dark-theme .premium-card h1 {
+    color: var(--primary) !important;
+}
+
+@media (max-width: 700px) {
+    .account-title,
+    .budget-page-header h1,
+    .leaderboard-hero-text h1,
+    .reports-header-row h1,
+    .payments-header h1,
+    .history-header h1,
+    .payment-card h1,
+    .premium-card h1 {
+        font-size: 28px !important;
+    }
+}
+
+/* Dashboard hero follows the same main-title scale while keeping its white-on-gradient treatment. */
+.dashboard-hero h1 {
+    font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: var(--page-title-size) !important;
+    line-height: var(--page-title-line-height) !important;
+    font-weight: var(--page-title-weight) !important;
+    letter-spacing: -.03em !important;
+    color: #ffffff !important;
+}

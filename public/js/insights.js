@@ -1,14 +1,15 @@
-// Daily Insight widget. Renders 1-3 short, positive, data-backed insights
-// on the dashboard. Silently hides itself for non-premium users or when
-// there isn't enough data yet, rather than showing an error.
+// Daily Insight widget. The server computes the user's real spending facts.
+// When GEMINI_API_KEY is configured, the server can turn those facts into a
+// concise AI-written coaching message. A deterministic fallback is returned
+// when AI is unavailable.
 
 const escapeInsightHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 async function loadDailyInsights() {
     const card = document.getElementById("dailyInsightCard");
-    const list = document.getElementById("insightList");
-    if (!card || !list) return;
+    const messageEl = document.getElementById("dailyInsightMessage");
+    if (!card || !messageEl) return;
 
     if (typeof isPremium === "function" && !isPremium()) {
         card.hidden = true;
@@ -17,18 +18,18 @@ async function loadDailyInsights() {
 
     try {
         const response = await api.get("/budget/insights", { timeout: 8000 });
-        const insights = response.data?.insights || [];
-        if (!insights.length) {
+        const insight = response.data?.insight || response.data?.insights?.[0];
+        if (!insight?.message) {
             card.hidden = true;
             return;
         }
-        list.innerHTML = insights.map((insight) =>
-            `<li class="insight-item insight-${escapeInsightHtml(insight.tone || "neutral")}">${escapeInsightHtml(insight.message)}</li>`
-        ).join("");
+
+        const tone = insight.tone || "neutral";
+        messageEl.textContent = insight.message;
+        messageEl.dataset.tone = tone;
+
         card.hidden = false;
     } catch (err) {
-        // Insights are a nice-to-have on the dashboard; never block or
-        // error out the rest of the page if they fail to load.
         card.hidden = true;
     }
 }

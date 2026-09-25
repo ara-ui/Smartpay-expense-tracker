@@ -7,6 +7,7 @@ const {
     getOrCreateBudgetRule
 } = require("../services/budgetService");
 const BudgetAuditLog = require("../model/BudgetAuditLog");
+const { generateSpendingInsight } = require("../services/aiInsightService");
 const { createBudgetReauthToken } = require("../utils/budgetReauth");
 
 const PERIODS = ["daily", "weekly", "monthly"];
@@ -250,7 +251,32 @@ exports.getBudgetStatus = async (req, res) => {
 exports.getInsights = async (req, res) => {
     try {
         const { insights } = await getDailyInsights(req.user._id);
-        res.status(200).json({ success: true, insights });
+        const primary = insights?.[0];
+
+        if (!primary) {
+            return res.status(200).json({ success: true, insight: null, insights: [] });
+        }
+
+        const aiMessage = await generateSpendingInsight({
+            currentInsightFacts: insights.slice(0, 3).map((item) => ({
+                type: item.type,
+                tone: item.tone,
+                message: item.message
+            }))
+        });
+
+        const insight = {
+            ...primary,
+            heading: primary.tone === "positive"
+                ? "You're making good progress"
+                : primary.tone === "warning"
+                    ? "A quick spending check-in"
+                    : "Your spending check-in",
+            message: aiMessage || primary.message,
+            aiGenerated: Boolean(aiMessage)
+        };
+
+        res.status(200).json({ success: true, insight, insights });
     } catch (err) {
         console.error("Get daily insights failed:", err);
         res.status(500).json({

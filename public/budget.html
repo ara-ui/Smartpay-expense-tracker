@@ -14,8 +14,8 @@
 
     <main class="budget-page">
         <header class="budget-page-header">
-            <div>
-                <p class="budget-eyebrow">SPENDING PLAN</p>
+            <div class="leaderboard-hero-text">
+                <h1>Spending Plan</h1>
 
             </div>
         </header>
@@ -55,15 +55,19 @@
             </div>
         </section>
 
+        <section class="budget-actions" aria-label="Budget actions">
+            <button type="button" class="budget-action-btn budget-action-primary" id="editOverallLimitsBtn">
+                <span class="budget-action-icon" aria-hidden="true">↗</span>
+                <span>Update Budget Limits</span>
+            </button>
+            <button type="button" class="budget-action-btn budget-action-secondary" id="setCategoryLimitsBtn">
+                <span class="budget-action-icon" aria-hidden="true">◈</span>
+                <span>Set Category Limits</span>
+            </button>
+        </section>
+
         <section class="budget-section" aria-labelledby="overallLimitsTitle">
-            <div class="section-heading-row">
-                <div>
-                    <h2 id="overallLimitsTitle">Overall Spending Limits</h2>
-
-                </div>
-            </div>
-
-            <form id="overallBudgetForm" class="budget-card budget-form">
+            <form id="overallBudgetForm" class="budget-card budget-form budget-collapsible" hidden>
                 <div class="limit-grid">
                     <label class="limit-field">
                         <span>Daily limit (₹)</span>
@@ -86,7 +90,7 @@
 
                 <div class="form-actions">
                     <button type="button" class="secondary-btn" id="clearOverallLimitsBtn" hidden>Clear all</button>
-                    <button type="button" class="secondary-btn edit-limits-btn" id="editOverallLimitsBtn">Edit limits</button>
+                    <button type="button" class="secondary-btn edit-limits-btn" id="editOverallLimitsBtn">Update budget limits</button>
                     <button type="submit" class="primary-btn" id="saveOverallLimitsBtn" hidden>Save limits</button>
                 </div>
                 <p id="overallBudgetMessage" class="form-message" role="status"></p>
@@ -105,14 +109,7 @@
         </section>
 
         <section class="budget-section" aria-labelledby="categoryLimitsTitle">
-            <div class="section-heading-row">
-                <div>
-                    <h2 id="categoryLimitsTitle">Category Limits</h2>
-
-                </div>
-            </div>
-
-            <form id="categoryBudgetForm" class="budget-card budget-form">
+            <form id="categoryBudgetForm" class="budget-card budget-form budget-collapsible" hidden>
                 <div class="category-form-grid">
                     <label class="limit-field">
                         <span>Category</span>
@@ -140,7 +137,7 @@
                 <p id="categoryBudgetMessage" class="form-message" role="status"></p>
             </form>
 
-            <div id="categoryLimitsList" class="category-list"></div>
+            <div id="categoryLimitsList" class="category-list budget-collapsible" hidden></div>
         </section>
 
         <section class="budget-note">

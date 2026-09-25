@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     renderProfileCard(user);
     renderMembershipCard(user);
-    renderQuickStats();
     renderReportHistorySection(user);
     renderSettingsShortcuts();
 
@@ -183,84 +182,6 @@ async function loadMembershipDetails() {
 
         purchaseDateEl.textContent = "Unable to load";
         lastPaymentDateEl.textContent = "Unable to load";
-
-    }
-
-}
-
-// ---------------------------------------------------------------------
-// 4. QUICK STATISTICS
-// ---------------------------------------------------------------------
-// Wired to GET /users/stats via the shared `api` instance from
-// apiConfig.js. Keeps the same .acc-card-title / .acc-grid /
-// .acc-stat-card markup from Sprint 2.2 —
-// only the values become real.
-
-function renderQuickStats() {
-
-    document.getElementById("statsSection").innerHTML = `
-
-        <div class="acc-card-title">📊 Quick Statistics</div>
-
-        <div class="acc-grid">
-
-            <div class="acc-stat-card">
-                <h3>Total Expenses</h3>
-                <div class="acc-stat-value acc-placeholder" id="statTotalValue">Loading...</div>
-            </div>
-
-            <div class="acc-stat-card">
-                <h3>This Month</h3>
-                <div class="acc-stat-value acc-placeholder" id="statMonthValue">Loading...</div>
-            </div>
-
-            <div class="acc-stat-card">
-                <h3>Today's Expenses</h3>
-                <div class="acc-stat-value acc-placeholder" id="statTodayValue">Loading...</div>
-            </div>
-
-            <div class="acc-stat-card">
-                <h3>Highest Category</h3>
-                <div class="acc-stat-value acc-placeholder" id="statCategoryValue">Loading...</div>
-            </div>
-
-        </div>
-
-    `;
-
-    loadQuickStats();
-
-}
-
-async function loadQuickStats() {
-
-    const totalEl = document.getElementById("statTotalValue");
-    const monthEl = document.getElementById("statMonthValue");
-    const todayEl = document.getElementById("statTodayValue");
-    const categoryEl = document.getElementById("statCategoryValue");
-
-    try {
-
-        const response = await api.get("/users/stats");
-        const stats = response.data;
-
-        totalEl.textContent = `₹${stats.totalExpenses}`;
-        monthEl.textContent = `₹${stats.thisMonthExpenses}`;
-        todayEl.textContent = `₹${stats.todayExpenses}`;
-        categoryEl.textContent = stats.highestCategory ? stats.highestCategory : "No expenses yet";
-
-        [totalEl, monthEl, todayEl, categoryEl].forEach(el => {
-            el.classList.remove("acc-placeholder");
-        });
-
-    }
-    catch (err) {
-
-        console.log(err);
-
-        [totalEl, monthEl, todayEl, categoryEl].forEach(el => {
-            el.textContent = "Unable to load";
-        });
 
     }
 

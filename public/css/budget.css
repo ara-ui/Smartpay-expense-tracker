@@ -515,3 +515,152 @@ body {
 .budget-forgot-link:hover {
     text-decoration: underline;
 }
+
+
+/* ==================================================
+   Budget UI v1 — progressive disclosure + color hierarchy
+   UI-only styles; budget logic remains in budget.js.
+================================================== */
+
+.budget-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.budget-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 54px;
+    padding: 13px 18px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast),
+                color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.budget-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.budget-action-btn:active {
+    transform: translateY(0);
+}
+
+.budget-action-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    font-size: 15px;
+}
+
+.budget-action-primary {
+    background: var(--primary-soft);
+    border-color: rgba(37, 99, 235, .22);
+    color: var(--primary);
+}
+
+.budget-action-primary .budget-action-icon {
+    background: rgba(37, 99, 235, .12);
+}
+
+.budget-action-primary:hover {
+    background: rgba(37, 99, 235, .12);
+    border-color: rgba(37, 99, 235, .35);
+}
+
+.budget-action-secondary {
+    background: var(--success-soft);
+    border-color: rgba(15, 118, 110, .20);
+    color: var(--accent);
+}
+
+.budget-action-secondary .budget-action-icon {
+    background: rgba(15, 118, 110, .12);
+}
+
+.budget-action-secondary:hover {
+    background: rgba(15, 118, 110, .12);
+    border-color: rgba(15, 118, 110, .32);
+}
+
+.budget-collapsible {
+    animation: budgetReveal .18s ease-out;
+}
+
+@keyframes budgetReveal {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.budget-overview-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.budget-overview-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--primary);
+}
+
+.budget-overview-stat:nth-child(2) strong {
+    color: var(--primary);
+}
+
+.budget-overview-stat:nth-child(3) strong {
+    color: var(--accent);
+}
+
+.status-card {
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.status-card:hover {
+    border-color: rgba(37, 99, 235, .25);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.category-row {
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.category-row:hover {
+    border-color: rgba(15, 118, 110, .25);
+    box-shadow: var(--shadow-sm);
+}
+
+.budget-note {
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+}
+
+html.dark-theme .budget-action-primary {
+    background: rgba(37, 99, 235, .14);
+    border-color: rgba(96, 165, 250, .25);
+}
+
+html.dark-theme .budget-action-secondary {
+    background: rgba(45, 212, 191, .10);
+    border-color: rgba(45, 212, 191, .22);
+}
+
+@media (max-width: 600px) {
+    .budget-actions {
+        grid-template-columns: 1fr;
+    }
+}
