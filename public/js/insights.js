@@ -26,7 +26,7 @@ async function loadDailyInsights() {
     }
 
     try {
-        const response = await api.get("/budget/insights", { timeout: 20000 });
+        const response = await api.get("/budget/insights", { timeout: 8000 });
         const insight = response.data?.insight || response.data?.insights?.[0];
 
         const userName = getLoggedInUserName();
