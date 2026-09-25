@@ -1,7 +1,16 @@
-// Daily Insight widget. The server computes the user's real spending facts.
-// When GEMINI_API_KEY is configured, the server can turn those facts into a
-// concise AI-written coaching message. A deterministic fallback is returned
-// when AI is unavailable.
+function getLoggedInUserName() {
+    const token = localStorage.getItem("token");
+    if (!token || typeof jwt_decode !== "function") {
+        return "User";
+    }
+
+    try {
+        const user = jwt_decode(token);
+        return user?.name || user?.username || "User";
+    } catch {
+        return "User";
+    }
+}
 
 const escapeInsightHtml = (value) => String(value ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -17,8 +26,16 @@ async function loadDailyInsights() {
     }
 
     try {
-        const response = await api.get("/budget/insights", { timeout: 8000 });
+        const response = await api.get("/budget/insights", { timeout: 20000 });
         const insight = response.data?.insight || response.data?.insights?.[0];
+
+        const userName = getLoggedInUserName();
+        const greetingEl = document.getElementById("dashboardGreeting");
+
+        if (greetingEl) {
+            greetingEl.textContent = `Welcome back, ${userName}`;
+        }
+
         if (!insight?.message) {
             card.hidden = true;
             return;
