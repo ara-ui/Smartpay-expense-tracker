@@ -4,12 +4,15 @@ const ai = process.env.GEMINI_API_KEY
     ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
     : null;
 
-const MODEL = process.env.GEMINI_INSIGHT_MODEL || process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const MODEL =
+    process.env.GEMINI_INSIGHT_MODEL ||
+    process.env.GEMINI_MODEL ||
+    "gemini-3.5-flash";
 
 function cleanText(value) {
     return String(value || "")
         .replace(/\s+/g, " ")
-        .replace(/^['\"]|['\"]$/g, "")
+        .replace(/^['"*]+|['"*]+$/g, "")
         .trim();
 }
 
@@ -28,15 +31,49 @@ async function generateSpendingInsight(facts) {
     ].join("\n");
 
     try {
-        const response = await ai.models.generateContent({
-            model: MODEL,
-            contents: prompt
-        });
-        const message = cleanText(response.text);
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": process.env.GEMINI_API_KEY
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [
+                                {
+                                    text: prompt
+                                }
+                            ]
+                        }
+                    ]
+                })
+            }
+        );
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+                `Gemini API ${response.status}: ${errorText}`
+            );
+        }
+
+        const data = await response.json();
+
+        const message = cleanText(
+            data?.candidates?.[0]?.content?.parts?.[0]?.text
+        );
+
         if (!message || message.length > 220) return null;
+
         return message;
     } catch (error) {
-        console.warn("AI spending insight unavailable; using deterministic insight:", error.message);
+        console.warn(
+            "AI spending insight unavailable; using deterministic insight:",
+            error.message
+        );
         return null;
     }
 }

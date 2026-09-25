@@ -1,9 +1,7 @@
-#userHeaderContainer{
-
-    width:100%;
-
-    margin-bottom:25px;
-
+#userHeaderContainer {
+    width: 100%;
+    margin-bottom: 25px;
+    min-height: 166px;
 }
 
 .app-header{
